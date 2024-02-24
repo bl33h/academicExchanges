@@ -16,7 +16,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import './NavBar.scss';
 import Logo from '../../assets/images/logo.png';
 import {useNavigate} from "react-router-dom";
-import {supabase} from "../../supabase/client";
+import connectDB from '../../supabase/client';
 
 const pages = ['Estudiantes de Intercambio', 'Estudiantes', 'Universidades', 'Resumen',];
 const settings = ['Perfil', 'Cerrar Sesión',];
@@ -43,15 +43,15 @@ function NavBar() {
     };
 
 
-    const handleLogout = async () => {
-        try {
-            await supabase.auth.signOut().then(
-                navigate("/")
-            );
-        } catch (error) {
-            console.log('Error signing out:', error.message);
-        }
-    }
+    // const handleLogout = async () => {
+    //     try {
+    //         await supabase.auth.signOut().then(
+    //             navigate("/")
+    //         );
+    //     } catch (error) {
+    //         console.log('Error signing out:', error.message);
+    //     }
+    // }
 
     const handleProfile = () => {
         navigate("/profile");
@@ -59,8 +59,8 @@ function NavBar() {
 
     const handleUserMenuItemClick = (setting) => {
         switch (setting) {
-            case 'Cerrar Sesión':
-                return handleLogout;
+            // case 'Cerrar Sesión':
+            //     return handleLogout;
             case 'Perfil':
                 return handleProfile;
             default:

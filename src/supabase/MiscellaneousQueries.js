@@ -1,40 +1,40 @@
-import {supabase} from './client';
+// import {supabase} from './client';
 
-const getModalities = async () => {
-    const {data, error} = await supabase
-        .from('modalidades')
-        .select('*')
+// const getModalities = async () => {
+//     const {data, error} = await supabase
+//         .from('modalidades')
+//         .select('*')
 
-    if (error) {
-        throw error;
-    } else {
-        return data.map((modality) => {
-            return {
-                modality: modality.modalidad,
-                id: modality.id,
-            }
-        });
-    }
-}
+//     if (error) {
+//         throw error;
+//     } else {
+//         return data.map((modality) => {
+//             return {
+//                 modality: modality.modalidad,
+//                 id: modality.id,
+//             }
+//         });
+//     }
+// }
 
-const getStates = async () => {
-    const {data, error} = await supabase
-        .from('estados')
-        .select('*')
+// const getStates = async () => {
+//     const {data, error} = await supabase
+//         .from('estados')
+//         .select('*')
 
-    if (error) {
-        throw error;
-    } else {
-        return data.map((state) => {
-            return {
-                state: state.estado,
-                id: state.id,
-            }
-        });
-    }
-}
+//     if (error) {
+//         throw error;
+//     } else {
+//         return data.map((state) => {
+//             return {
+//                 state: state.estado,
+//                 id: state.id,
+//             }
+//         });
+//     }
+// }
 
-export {
-    getStates,
-    getModalities,
-}
+// export {
+//     getStates,
+//     getModalities,
+// }

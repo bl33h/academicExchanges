@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-const mongoDBAtlasUri = 'mongodb+srv://per21371:per21371@intercambios.eg3fuqe.mongodb.net/';
+const mongoDBAtlasUri = 'mongodb+srv://per21371:per21371@intercambios.eg3fuqe.mongodb.net/?retryWrites=true&w=majority&appName=Intercambios';
 
 const connectDB = async () => {
     try {

@@ -1,6 +1,7 @@
 import './App.scss';
 import React, {useEffect, useState} from 'react';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import axios from 'axios';
 import connectDB from './supabase/client';
 import SignUp from "./pages/SignUp/SignUp";
 import LogIn from "./pages/LogIn/LogIn";
@@ -18,21 +19,35 @@ import NewExchange from "./pages/StudentsInExchanges/New/NewExchange";
 import EditExchange from "./pages/StudentsInExchanges/Edit/EditExchange";
 
 const App = () => {
-    const [session, setSession] = useState(null)
+    const [session, setSession] = useState(null);
 
     useEffect(() => {
-        supabase.auth.getSession().then(({data: {session}}) => {
-            setSession(session)
-        })
+        const fetchData = async () => {
+            try {
+                const response = await axios.post('https://us-east-2.aws.data.mongodb-api.com/app/data-xugpf/endpoint/data/v1', {
+                    "collection": "users",
+                    "database": "Intercambios",
+                    "dataSource": "Intercambios",
+                    "projection": {
+                        "_id": 1
+                    }
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Request-Headers': '*',
+                        'api-key': 'tkBgxu6PNeNCVZY8nrldJJDRXRfsT1byH9PqMZ0ov8E7pRZFMBpegrFtGFPtod28',
+                    }
+                });
 
-        const {
-            data: {subscription},
-        } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session)
-        })
+                console.log(response.data); // Log the response data
+            } catch (error) {
+                console.error(error); // Log any errors
+            }
+        };
 
-        return () => subscription.unsubscribe()
-    }, [])
+        // Call the fetchData function when the component mounts
+        fetchData();
+    }, []);
 
     return (
         <div className="App">

@@ -1,5 +1,5 @@
 import connectDB from './client'; // Adjust the path to your connection file
-import User from './models/User'; // Adjust the path to your User model
+import User from './models/Users'; // Adjust the path to your User model
 
 const isWhitelisted = async (email) => {
     await connectDB(); // Ensure the DB is connected before querying
