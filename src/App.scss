@@ -1,0 +1,10 @@
+@import './styles/Global';
+
+.app {
+  margin: 0 auto;
+  padding: 0 1rem;
+  background-color: $white;
+  color: $black;
+  font-family: $fontFamily;
+  min-height: 100vh;
+}

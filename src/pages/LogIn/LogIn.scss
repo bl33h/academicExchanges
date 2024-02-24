@@ -1,0 +1,14 @@
+@import '../../styles/Global';
+
+.log-in {
+  background-color: $white;
+
+  .submit-button {
+    background-color: $green;
+    color: $white;
+
+    &:hover {
+      background-color: $darkGreen;
+    }
+  }
+}
