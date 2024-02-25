@@ -1,0 +1,14 @@
+
+*.json
+*.ts
+*.mjs
+*.pack
+*.old
+*.map
+node_modules/@adobe/css-tools/LICENSE
+*.md
+node_modules/@babel/code-frame/LICENSE
+node_modules/yocto-queue/license
+node_modules/yargs/yargs
+node_modules/yargs/LICENSE
+*.cjs
