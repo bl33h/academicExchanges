@@ -4,17 +4,16 @@ import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
-# Load config from a .env file:
+# Load config from a .env file
 load_dotenv()
 MONGODB_URI = os.environ['MONGODB_URI']
 
-# Connect to your MongoDB cluster:
+# Connect to your MongoDB cluster
 client = MongoClient(MONGODB_URI)
 
-# Get a reference to the 'sample_mflix' database:
 db = client['Intercambios']
 
-# List all the collections in 'sample_mflix':
+# List all the collections
 collections = db.list_collection_names()
 for collection in collections:
    print(collection)
