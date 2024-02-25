@@ -12,8 +12,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import './SignUp.scss';
 import {useState} from "react";
-import connectDB from '../../supabase/client';
-import User from '../../supabase/models/Users';
+import {supabase} from "../../supabase/client";
 import {isWhitelisted} from "../../supabase/AccountsQueries";
 import NotAllowedAlert from "../../components/Alerts/NotAllowedAlert";
 import UserAlreadyExistsAlert from "../../components/Alerts/UserAlreadyExistsAlert";
@@ -43,13 +42,19 @@ export default function SignUp() {
     };
 
     const signUp = async (email, password, name, lastName) => {
-        await connectDB();
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-          setUserAlreadyExists(true);
-          return;
+        const {error} = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                name: name,
+                lastName: lastName
+            }
+        });
+        if (error) {
+            console.log(error);
+            setUserAlreadyExists(true);
         }
-    }   
+    }
 
     const handleSubmit = async (event) => {
         event.preventDefault();

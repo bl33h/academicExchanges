@@ -1,14 +1,7 @@
-import mongoose from 'mongoose';
-const mongoDBAtlasUri = 'mongodb+srv://per21371:per21371@intercambios.eg3fuqe.mongodb.net/?retryWrites=true&w=majority&appName=Intercambios';
+import {createClient} from '@supabase/supabase-js'
 
-const connectDB = async () => {
-    try {
-        await mongoose.connect(mongoDBAtlasUri, { useNewUrlParser: true, useUnifiedTopology: true });
-        console.log('MongoDB connection successful');
-    } catch (err) {
-        console.error('MongoDB connection error:', err);
-        process.exit(1); // Exit process with failure
-    }
-};
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
+const supabaseKey = process.env.REACT_APP_SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
 
-export default connectDB;
+export {supabase};

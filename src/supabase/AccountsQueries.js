@@ -1,15 +1,16 @@
-import connectDB from './client'; // Adjust the path to your connection file
-import User from './models/Users'; // Adjust the path to your User model
+import {supabase} from './client';
 
 const isWhitelisted = async (email) => {
-    await connectDB(); // Ensure the DB is connected before querying
-    try {
-        const user = await User.findOne({ email: email }).exec();
-        return !!user; // Returns true if the user exists, otherwise false
-    } catch (err) {
-        console.error('Error checking whitelist:', err);
-        throw err; // Rethrow or handle the error as needed
-    }
-};
+    const {data, error} = await supabase
+        .from('WhiteList')
+        .select('email')
+        .eq('email', email)
 
-export { isWhitelisted };
+    if (error) {
+        throw error;
+    } else {
+        return data.length > 0;
+    }
+}
+
+export {isWhitelisted};

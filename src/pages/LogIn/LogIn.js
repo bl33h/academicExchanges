@@ -1,7 +1,6 @@
 // https://github.com/mui/material-ui/blob/v5.13.4/docs/data/material/getting-started/templates/sign-in/SignIn.js
 import * as React from 'react';
 import {useState} from 'react';
-import axios from 'axios';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -13,7 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import './LogIn.scss';
-import connectDB from '../../supabase/client';
+import {supabase} from "../../supabase/client";
 import {useNavigate} from "react-router-dom";
 import {FormControl, InputAdornment, InputLabel, OutlinedInput} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
@@ -35,35 +34,17 @@ export default function LogIn() {
     };
 
     const logIn = async (email, password) => {
-        try {
-            const data = JSON.stringify({
-                "collection": "users",
-                "database": "Intercambios",
-                "dataSource": "Intercambios",
-                "projection": {
-                    "_id": 1
-                }
-            });
-    
-            const config = {
-                method: 'post',
-                url: 'https://us-east-2.aws.data.mongodb-api.com/app/data-xugpf/endpoint/data/v1',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Request-Headers': '*',
-                    'api-key': '<API_KEY>',
-                },
-                data: data
-            };
-    
-            const response = await axios(config);
-            console.log(JSON.stringify(response.data));
-            // Handle the response data here
-        } catch (error) {
-            console.error(error);
-            // Handle errors here
+        const {error} = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        })
+        if (error) {
+            console.log(error);
+            setInvalidLogin(true);
+        } else {
+            navigate('/');
         }
-    }    
+    }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -76,7 +57,7 @@ export default function LogIn() {
         try {
             await logIn(email, password);
         } catch (error) {
-            console.error(error);
+            console.log(error);
             setInvalidLogin(true);
         }
     }
