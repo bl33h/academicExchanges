@@ -1,18 +1,25 @@
-import os
-from dotenv import load_dotenv
-from pymongo import MongoClient
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from clientsManagement import studentsRouter, countriesRouter, majorsRouter, exchangesRouter, universitiesRouter, usersRouter
 
-# ------- env setup -------
-# load config from a .env file
-load_dotenv()
-MONGODB_URI = os.environ['MONGODB_URI']
+app = FastAPI()
 
-# connect to the MongoDB cluster
-client = MongoClient(MONGODB_URI)
+origins = ["*"]
 
-db = client['Intercambios']
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# list all the collections
-collections = db.list_collection_names()
-for collection in collections:
-   print(collection)
+app.include_router(studentsRouter)
+app.include_router(majorsRouter)
+app.include_router(countriesRouter)
+app.include_router(exchangesRouter)
+app.include_router(universitiesRouter)
+app.include_router(usersRouter)
+
+def run():
+    return app
