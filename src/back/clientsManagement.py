@@ -23,7 +23,7 @@ async def get_students():
     print (await db["students"].find().to_list(1000))
     return await db["students"].find().to_list(1000)
 
-@studentsRouter.post("/students/", response_model=Student)
+@studentsRouter.post("/students/", response_model=Student) # y
 async def create_student(student: Student):
     new_student = await db["students"].insert_one(student.dict(by_alias=True))
     return await db["students"].find_one({"_id": new_student.inserted_id})
@@ -33,7 +33,7 @@ async def get_countries():
     print (await db["countries"].find().to_list(1000))
     return await db["countries"].find().to_list(1000)
 
-@countriesRouter.post("/countries/", response_model=Country)
+@countriesRouter.post("/countries/", response_model=Country) # y
 async def create_country(country: Country):
     new_country = await db["countries"].insert_one(country.dict(by_alias=True))
     return await db["countries"].find_one({"_id": new_country.inserted_id})
@@ -44,7 +44,7 @@ async def get_careers():
     print(careers)
     return careers
 
-@majorsRouter.post("/careers/", response_model=Career)
+@majorsRouter.post("/careers/", response_model=Career) # y
 async def create_career(career: Career):
     new_career = await db["careers"].insert_one(career.dict())
     created_career = await db["careers"].find_one({"_id": new_career.inserted_id})
@@ -68,7 +68,7 @@ async def get_universities():
     print(universities)
     return universities
 
-@universitiesRouter.post("/universities/", response_model=University)
+@universitiesRouter.post("/universities/", response_model=University) # y
 async def create_university(university: University):
     new_university = await db["universities"].insert_one(university.dict())
     created_university = await db["universities"].find_one({"_id": new_university.inserted_id})
@@ -80,7 +80,7 @@ async def get_users():
     print(users)
     return users
 
-@usersRouter.post("/users/", response_model=User)
+@usersRouter.post("/users/", response_model=User) # y
 async def create_user(user: User):
     new_user = await db["users"].insert_one(user.dict())
     created_user = await db["users"].find_one({"_id": new_user.inserted_id})
