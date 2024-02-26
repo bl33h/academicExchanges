@@ -6,6 +6,7 @@ from models import Student, Country, Exchange, Career, University, User, UserLog
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.hash import bcrypt
 from passlib.context import CryptContext
+from bson import ObjectId
 
 load_dotenv()
 MONGODB_URI = os.environ['MONGODB_URI']
