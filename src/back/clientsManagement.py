@@ -60,7 +60,12 @@ async def update_student(student_id: str, student: Student):
     if updated_student:
         updated_student["_id"] = str(updated_student["_id"])
         updated_student["career_id"] = str(updated_student["career_id"])
-        return updated_student
+        print(updated_student)
+        return {
+            "name": updated_student["name"],
+            "email": updated_student["email"],
+            **updated_student
+        }
     else:
         return {"error": "Estudiante no encontrado"}, 404
 
@@ -91,7 +96,7 @@ async def get_country_by_id(country_id: str = Path(...)):
         return country
     else:
         return {"error": "País no encontrado"}, 404
-
+    
 @majorsRouter.get("/careers/") # y
 async def get_careers():
     careers = await db["careers"].find().to_list(1000)
