@@ -29,18 +29,29 @@ async def get_students():
         student["career_id"] = str(student["career_id"])
     return students
 
-@studentsRouter.post("/students/", response_model=Student) # y
+@studentsRouter.post("/students/", response_model=Student)
 async def create_student(student: Student):
-    new_student = await db["students"].insert_one(student.dict(by_alias=True))
+    # Convierte las cadenas _id y career_id a ObjectId
+    student_dict = student.dict(by_alias=True)
+    student_dict["career_id"] = ObjectId(student_dict["career_id"])
+
+    new_student = await db["students"].insert_one(student_dict)
     return await db["students"].find_one({"_id": new_student.inserted_id})
 
 @countriesRouter.get("/countries/") # y
 async def get_countries():
-    print (await db["countries"].find().to_list(1000))
-    return await db["countries"].find().to_list(1000)
+    countries = await db["countries"].find().to_list(1000)
+    for country in countries:
+        country["_id"] = str(country["_id"])
+        country["continent"]["_id"] = str(country["continent"]["_id"])
+    return countries
 
 @countriesRouter.post("/countries/", response_model=Country) # y
 async def create_country(country: Country):
+    country_dict = country.dict(by_alias=True)
+    country_dict["_id"] = ObjectId(country_dict["_id"])
+    country_dict["continent"]["_id"] = ObjectId(country_dict["continent"]["_id"])
+
     new_country = await db["countries"].insert_one(country.dict(by_alias=True))
     return await db["countries"].find_one({"_id": new_country.inserted_id})
 
@@ -59,7 +70,10 @@ async def create_career(career: Career):
 @exchangesRouter.get("/exchanges/") # y
 async def get_exchanges():
     exchanges = await db["exchanges"].find().to_list(1000)
-    print(exchanges)
+    for exchange in exchanges:
+        exchange["_id"] = str(exchange["_id"])
+        exchange["student_id"] = str(exchange["student_id"])
+        exchange["university_id"] = str(exchange["university_id"])
     return exchanges
 
 @exchangesRouter.post("/exchanges/", response_model=Exchange)
