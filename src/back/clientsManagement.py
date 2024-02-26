@@ -103,6 +103,14 @@ async def get_country_by_id(country_id: str = Path(...)):
         return country
     else:
         return {"error": "País no encontrado"}, 404
+
+@countriesRouter.delete("/countries/{country_id}")
+async def delete_country(country_id: str):
+    delete_result = await db["countries"].delete_one({"_id": ObjectId(country_id)})
+    if delete_result.deleted_count == 1:
+        return {"message": "País eliminado"}
+    else:
+        return {"error": "País no encontrado"}, 404
     
 @majorsRouter.get("/careers/") # y
 async def get_careers():
