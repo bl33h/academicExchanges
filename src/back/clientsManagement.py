@@ -1,7 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Path
 from models import Student, Country, Exchange, Career, University, User
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.hash import bcrypt
@@ -28,6 +28,17 @@ async def get_students():
         student["_id"] = str(student["_id"])
         student["career_id"] = str(student["career_id"])
     return students
+
+@studentsRouter.get("/students/{student_id}")
+async def get_student_by_id(student_id: str = Path(...)):
+    student = await db["students"].find_one({"_id": ObjectId(student_id)})
+
+    if student:
+        student["_id"] = str(student["_id"])
+        student["career_id"] = str(student["career_id"])
+        return student
+    else:
+        return {"error": "Estudiante no encontrado"}, 404
 
 @studentsRouter.post("/students/", response_model=Student)
 async def create_student(student: Student):
@@ -67,13 +78,37 @@ async def create_career(career: Career):
     created_career = await db["careers"].find_one({"_id": new_career.inserted_id})
     return created_career
 
-@exchangesRouter.get("/exchanges/") # y
+@exchangesRouter.get("/exchanges/")
 async def get_exchanges():
-    exchanges = await db["exchanges"].find().to_list(1000)
+    pipeline = [
+        {
+            "$lookup": {
+                "from": "students",
+                "localField": "student_id",
+                "foreignField": "_id",
+                "as": "student_info"
+            }
+        },
+        {
+            "$unwind": "$student_info"
+        },
+        {
+            "$project": {
+                "_id": {"$toString": "$_id"},
+                "student_id": {"$toString": "$student_id"},
+                "university_id": {"$toString": "$university_id"},
+                "details": "$details",
+                "student": "$student_info"
+            }
+        }
+    ]
+
+    exchanges = await db["exchanges"].aggregate(pipeline).to_list(1000)
+
     for exchange in exchanges:
-        exchange["_id"] = str(exchange["_id"])
-        exchange["student_id"] = str(exchange["student_id"])
-        exchange["university_id"] = str(exchange["university_id"])
+        exchange["student"]["_id"] = str(exchange["student"]["_id"])
+        exchange["student"]["career_id"] = str(exchange["student"]["career_id"])
+    
     return exchanges
 
 @exchangesRouter.post("/exchanges/", response_model=Exchange)
@@ -85,7 +120,9 @@ async def create_exchange(exchange: Exchange):
 @universitiesRouter.get("/universities/") # y
 async def get_universities():
     universities = await db["universities"].find().to_list(1000)
-    print(universities)
+    for university in universities:
+        university["_id"] = str(university["_id"])
+        university["country_id"] = str(university["country_id"])
     return universities
 
 @universitiesRouter.post("/universities/", response_model=University) # y
