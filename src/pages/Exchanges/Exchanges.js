@@ -10,7 +10,7 @@ const Exchanges = () => {
     const navigate = useNavigate();
 
     const handleRegister = () => {
-        navigate("/exchange/new");
+        navigate("/exchanges/new");
     }
 
     return (

@@ -55,7 +55,7 @@ const columns = [
                 icon={<EditIcon/>}
                 label="Editar"
                 onClick={() => {
-                    window.location.href = `/exchange/edit/${params.id}`;
+                    window.location.href = `/exchanges/edit/${params.id}`;
                 }}
                 showInMenu
             />,

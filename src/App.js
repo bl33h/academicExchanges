@@ -18,8 +18,8 @@ const App = () => {
                         <Route path="/" element={<Exchanges/>}/>
                         {/*INTERCAMBIOS*/}
                         <Route path="/exchanges" element={<Exchanges/>}/>
-                        <Route path="/exchange/new" element={<NewExchange/>}/>
-                        <Route path="/exchange/edit/:id" element={<EditExchange/>}/>
+                        <Route path="/exchanges/new" element={<NewExchange/>}/>
+                        <Route path="/exchanges/edit/:id" element={<EditExchange/>}/>
                         {/*/!*STUDENTS*!/*/}
                         {/*<Route path="/students" element={<Students/>}/>*/}
                         {/*<Route path="/students/new" element={<NewStudent/>}/>*/}
