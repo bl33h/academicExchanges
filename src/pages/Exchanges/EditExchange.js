@@ -1,4 +1,4 @@
-import ExchangeForm from "../../../components/Forms/ExchangeForm";
+import ExchangeForm from "./ExchangeForm";
 import {useParams} from "react-router-dom";
 
 

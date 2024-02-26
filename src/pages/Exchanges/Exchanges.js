@@ -1,31 +1,23 @@
 import Container from "@mui/material/Container";
 import {Paper} from "@mui/material";
 import Typography from "@mui/material/Typography";
-import "./Students.scss"
-import Table from '../Table/Table'
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import Table from "./Table";
 import Button from "@mui/material/Button";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {useNavigate} from "react-router-dom";
 
-
-const Students = () => {
+const Exchanges = () => {
     const navigate = useNavigate();
+
     const handleRegister = () => {
-        navigate("/estudiantes/new");
+        navigate("/exchange/new");
     }
 
     return (
-        <Container
-            maxWidth={"xl"}
-            className={"students"}
-        >
-            <Paper className={"container"}>
-                <Typography
-                    variant={"h4"}
-                    className={"title"}
-                    sx={{fontFamily: "Roboto"}}
-                >
-                    Estudiantes
+        <Container maxWidth="xl" className="students">
+            <Paper className="container">
+                <Typography variant="h4" className="title" sx={{fontFamily: "Roboto"}}>
+                    Estudiantes de Intercambio
                 </Typography>
                 <Button
                     variant="contained"
@@ -37,13 +29,13 @@ const Students = () => {
                     }}
                     onClick={handleRegister}
                 >
-                    <PersonAddIcon/>
+                    <AddCircleIcon/>
                     Registrar
                 </Button>
             </Paper>
             <Table/>
         </Container>
-    )
-}
+    );
+};
 
-export default Students
+export default Exchanges;

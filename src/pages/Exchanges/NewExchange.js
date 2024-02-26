@@ -1,4 +1,4 @@
-import ExchangeForm from "../../../components/Forms/ExchangeForm";
+import ExchangeForm from "./ExchangeForm";
 
 
 const NewExchange = () => {
