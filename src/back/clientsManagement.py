@@ -60,12 +60,19 @@ async def update_student(student_id: str, student: Student):
     if updated_student:
         updated_student["_id"] = str(updated_student["_id"])
         updated_student["career_id"] = str(updated_student["career_id"])
-        print(updated_student)
         return {
             "name": updated_student["name"],
             "email": updated_student["email"],
             **updated_student
         }
+    else:
+        return {"error": "Estudiante no encontrado"}, 404
+
+@studentsRouter.delete("/students/{student_id}")
+async def delete_student(student_id: str):
+    delete_result = await db["students"].delete_one({"_id": ObjectId(student_id)})
+    if delete_result.deleted_count == 1:
+        return {"message": "Estudiante eliminado"}
     else:
         return {"error": "Estudiante no encontrado"}, 404
 
