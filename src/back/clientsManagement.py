@@ -70,9 +70,14 @@ async def update_student(student_id: str, student: Student):
 
 @studentsRouter.delete("/students/{student_id}")
 async def delete_student(student_id: str):
+    # delete the student
     delete_result = await db["students"].delete_one({"_id": ObjectId(student_id)})
+    
     if delete_result.deleted_count == 1:
-        return {"message": "Estudiante eliminado"}
+        # delete the exchange record of the student
+        await db["exchanges"].delete_many({"student_id": ObjectId(student_id)})
+        
+        return {"message": "Estudiante eliminado y registros de intercambio eliminados en cascada"}
     else:
         return {"error": "Estudiante no encontrado"}, 404
 
@@ -226,10 +231,13 @@ async def update_university(university_id: str, university: University):
 
 @universitiesRouter.delete("/universities/{university_id}")
 async def delete_university(university_id: str):
+    # delete the university
     delete_result = await db["universities"].delete_one({"_id": ObjectId(university_id)})
     
     if delete_result.deleted_count:
-        return {"message": "University successfully deleted"}
+        # delete all related exchanges
+        await db["exchanges"].delete_many({"university_id": ObjectId(university_id)})
+        return {"message": "University and related data successfully deleted"}
     else:
         return {"error": "University not found"}, 404
 
