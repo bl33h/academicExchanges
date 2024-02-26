@@ -93,12 +93,24 @@ async def get_exchanges():
             "$unwind": "$student_info"
         },
         {
-            "$project": {
+            "$lookup": {
+                "from": "universities",
+                "localField": "university_id",
+                "foreignField": "_id",
+                "as": "uni_info"
+            }
+        },
+        {
+            "$unwind": "$uni_info"
+        },
+        {
+            "$project":{
                 "_id": {"$toString": "$_id"},
                 "student_id": {"$toString": "$student_id"},
                 "university_id": {"$toString": "$university_id"},
                 "details": "$details",
-                "student": "$student_info"
+                "student": "$student_info",
+                "university": "$uni_info"
             }
         }
     ]
@@ -108,6 +120,9 @@ async def get_exchanges():
     for exchange in exchanges:
         exchange["student"]["_id"] = str(exchange["student"]["_id"])
         exchange["student"]["career_id"] = str(exchange["student"]["career_id"])
+        exchange["university"]["_id"] = str(exchange["university"]["_id"])
+        exchange["university"]["country_id"] = str(exchange["university"]["country_id"])
+
     
     return exchanges
 
