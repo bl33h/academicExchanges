@@ -20,7 +20,7 @@ const App = () => {
                         <Route path="/exchanges" element={<Exchanges/>}/>
                         <Route path="/exchanges/new" element={<NewExchange/>}/>
                         <Route path="/exchanges/edit/:id" element={<EditExchange/>}/>
-                        {/*/!*STUDENTS*!/*/}
+                        {/*STUDENTS*/}
                         {/*<Route path="/students" element={<Students/>}/>*/}
                         {/*<Route path="/students/new" element={<NewStudent/>}/>*/}
                         {/*<Route path="/students/edit/:id" element={<EditStudent/>}/>*/}

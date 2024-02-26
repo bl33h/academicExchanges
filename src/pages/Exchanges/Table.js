@@ -92,11 +92,6 @@ const columns = [
         width: 100,
     },
     {
-        field: 'cycle',
-        headerName: 'Ciclo',
-        width: 150,
-    },
-    {
         field: 'university',
         headerName: 'Universidad a visitar',
         width: 225,
@@ -112,16 +107,6 @@ const columns = [
         width: 130,
     },
     {
-        field: 'coursesUvg',
-        headerName: 'Cursos UVG',
-        width: 100,
-    },
-    {
-        field: 'coursesExchange',
-        headerName: 'Cursos de Intercambio',
-        width: 100,
-    },
-    {
         field: 'comments',
         headerName: 'Comentarios',
         width: 100,
@@ -129,60 +114,42 @@ const columns = [
 ];
 
 export default function Table() {
-    const [rows, setRows] = useState([
-        {
-            id: 1,
-            year: 2021,
-            semester: 1,
-            student: 'Juan Perez',
-            modality: 'Presencial',
-            cycle: 'Anual',
-            university: 'Universidad de los Andes',
-            state: 'Nominado',
-            date: '2021-07-01',
-            coursesUvg: 'Cálculo I, Cálculo II',
-            coursesExchange: 'Cálculo I, Cálculo II',
-            comments: 'Ninguno',
-        },
-        {
-            id: 2,
-            year: 2021,
-            semester: 1,
-            student: 'Juan Perez',
-            modality: 'Presencial',
-            cycle: 'Anual',
-            university: 'Universidad de los Andes',
-            state: 'Nominado',
-            date: '2021-07-01',
-            coursesUvg: 'Cálculo I, Cálculo II',
-            coursesExchange: 'Cálculo I, Cálculo II',
-            comments: 'Ninguno',
-        },
-        {
-            id: 3,
-            year: 2021,
-            semester: 1,
-            student: 'Juan Perez',
-            modality: 'Presencial',
-            cycle: 'Anual',
-            university: 'Universidad de los Andes',
-            state: 'Nominado',
-            date: '2021-07-01',
-            coursesUvg: 'Cálculo I, Cálculo II',
-            coursesExchange: 'Cálculo I, Cálculo II',
-            comments: 'Ninguno',
-        }
-    ]);
+    const [rows, setRows] = useState([]);
 
-    // useEffect(() => {
-    //     getStudentsInExchanges()
-    //         .then((data) => {
-    //             setRows(data);
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error fetching students in exchanges:', error)
-    //         });
-    // }, []);
+    const fetchData = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/exchanges/');
+            const data = await response.json();
+            return data.map((exchange) => {
+                return {
+                    id: exchange._id ?? 'N/A',
+                    year: exchange.details.year ?? 'N/A',
+                    semester: exchange.details.semester ?? 'N/A',
+                    student: exchange.student.name ?? 'N/A',
+                    modality: exchange.details.modality ?? 'N/A',
+                    // university: exchange.university.name,
+                    university: exchange.university.name ?? 'N/A',
+                    state: exchange.details.status ?? 'N/A',
+                    date: exchange.details.start_date ?? 'N/A',
+                    comments: exchange.details.comments ?? 'N/A',
+                }
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+
+    useEffect(() => {
+        fetchData()
+            .then((data) => {
+                console.log(data)
+                setRows(data);
+            })
+            .catch((error) => {
+                console.error('Error fetching students in exchanges:', error)
+            });
+    }, []);
 
     return (
         <>
