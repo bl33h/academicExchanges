@@ -6,6 +6,7 @@ import NotFound from "./pages/NotFound/NotFound";
 import Exchanges from "./pages/Exchanges/Exchanges";
 import NewExchange from "./pages/Exchanges/NewExchange";
 import EditExchange from "./pages/Exchanges/EditExchange";
+import NavBar from "./components/NavBars/NavBar";
 
 
 const App = () => {
@@ -13,7 +14,7 @@ const App = () => {
         <div className="App">
             <Router>
                 <>
-                    {/*<NavBar/>*/}
+                    <NavBar/>
                     <Routes>
                         <Route path="/" element={<Exchanges/>}/>
                         {/*INTERCAMBIOS*/}
