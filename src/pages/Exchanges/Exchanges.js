@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {useNavigate} from "react-router-dom";
 
-const Exchanges = () => {
+const StudentsInExchanges = () => {
     const navigate = useNavigate();
 
     const handleRegister = () => {
@@ -38,4 +38,4 @@ const Exchanges = () => {
     );
 };
 
-export default Exchanges;
+export default StudentsInExchanges;

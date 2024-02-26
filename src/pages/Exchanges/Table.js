@@ -127,7 +127,6 @@ export default function Table() {
                     semester: exchange.details.semester ?? 'N/A',
                     student: exchange.student.name ?? 'N/A',
                     modality: exchange.details.modality ?? 'N/A',
-                    // university: exchange.university.name,
                     university: exchange.university.name ?? 'N/A',
                     state: exchange.details.status ?? 'N/A',
                     date: exchange.details.start_date ?? 'N/A',
