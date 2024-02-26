@@ -1,12 +1,9 @@
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
-from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException, status, Depends, Path
-from models import Student, Country, Exchange, Career, University, User
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.hash import bcrypt
-from passlib.context import CryptContext
 from bson import ObjectId
+from dotenv import load_dotenv
+from fastapi import APIRouter, Path
+from motor.motor_asyncio import AsyncIOMotorClient
+from models import Student, Country, Exchange, Career, University, User
 
 load_dotenv()
 MONGODB_URI = os.environ['MONGODB_URI']
@@ -49,6 +46,24 @@ async def create_student(student: Student):
     new_student = await db["students"].insert_one(student_dict)
     return await db["students"].find_one({"_id": new_student.inserted_id})
 
+@studentsRouter.put("/students/{student_id}")
+async def update_student(student_id: str, student: Student):
+    student_dict = student.dict(exclude_unset=True)
+    student_dict["career_id"] = ObjectId(student_dict["career_id"])
+
+    updated_student = await db["students"].find_one_and_update(
+        {"_id": ObjectId(student_id)},
+        {"$set": student_dict},
+        return_document=True
+    )
+
+    if updated_student:
+        updated_student["_id"] = str(updated_student["_id"])
+        updated_student["career_id"] = str(updated_student["career_id"])
+        return updated_student
+    else:
+        return {"error": "Estudiante no encontrado"}, 404
+
 @countriesRouter.get("/countries/") # y
 async def get_countries():
     countries = await db["countries"].find().to_list(1000)
@@ -65,6 +80,17 @@ async def create_country(country: Country):
 
     new_country = await db["countries"].insert_one(country.dict(by_alias=True))
     return await db["countries"].find_one({"_id": new_country.inserted_id})
+
+@countriesRouter.get("/countries/{country_id}")
+async def get_country_by_id(country_id: str = Path(...)):
+    country = await db["countries"].find_one({"_id": ObjectId(country_id)})
+    if country:
+        country["_id"] = str(country["_id"])
+        if "continent" in country:
+            country["continent"]["_id"] = str(country["continent"]["_id"])
+        return country
+    else:
+        return {"error": "País no encontrado"}, 404
 
 @majorsRouter.get("/careers/") # y
 async def get_careers():
