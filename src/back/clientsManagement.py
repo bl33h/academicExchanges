@@ -178,6 +178,15 @@ async def create_exchange(exchange: Exchange):
     created_exchange = await db["exchanges"].find_one({"_id": new_exchange.inserted_id})
     return created_exchange
 
+@exchangesRouter.delete("/exchanges/{exchange_id}")
+async def delete_exchange(exchange_id: str):
+    delete_result = await db["exchanges"].delete_one({"_id": ObjectId(exchange_id)})
+    
+    if delete_result.deleted_count:
+        return {"message": "Exchange successfully deleted"}
+    else:
+        return {"error": "Exchange not found"}, 404
+
 @universitiesRouter.get("/universities/") # y
 async def get_universities():
     universities = await db["universities"].find().to_list(1000)
@@ -191,6 +200,38 @@ async def create_university(university: University):
     new_university = await db["universities"].insert_one(university.dict())
     created_university = await db["universities"].find_one({"_id": new_university.inserted_id})
     return created_university
+
+@universitiesRouter.put("/universities/{university_id}")
+async def update_university(university_id: str, university: University):
+    university_data = university.dict(by_alias=True, exclude_unset=True)
+    
+    # if the country_id is included, convert it to ObjectId
+    if 'country_id' in university_data:
+        university_data['country_id'] = ObjectId(university_data['country_id'])
+
+    updated_university = await db["universities"].find_one_and_update(
+        {"_id": ObjectId(university_id)},
+        {"$set": university_data},
+        {"returnNewDocument": True}
+    )
+    
+    if updated_university:
+        # converts the _id and country_id back to string
+        updated_university['_id'] = str(updated_university['_id'])
+        if 'country_id' in updated_university:
+            updated_university['country_id'] = str(updated_university['country_id'])
+        return updated_university
+    else:
+        return {"error": "University not found"}, 404
+
+@universitiesRouter.delete("/universities/{university_id}")
+async def delete_university(university_id: str):
+    delete_result = await db["universities"].delete_one({"_id": ObjectId(university_id)})
+    
+    if delete_result.deleted_count:
+        return {"message": "University successfully deleted"}
+    else:
+        return {"error": "University not found"}, 404
 
 @usersRouter.get("/users/") # y
 async def get_users():
