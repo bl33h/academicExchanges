@@ -1,36 +1,35 @@
 from pydantic import BaseModel
-from bson import ObjectId
 
 class Career(BaseModel):
-    _id: ObjectId
+    _id: str
     name: str
     faculty: dict
 
 class Country(BaseModel):
-    _id: ObjectId
+    _id: str
     name: str
     iso: str
     continent: dict
 
 class Exchange(BaseModel):
-    _id: ObjectId
-    student_id: ObjectId
-    university_id: ObjectId
+    _id: str
+    student_id: str
+    university_id: str
     details: dict
 
 class Student(BaseModel):
-    _id: ObjectId
+    _id: str
     name: str
     email: str
-    career_id: ObjectId
+    career_id: str
 
 class University(BaseModel):
-    _id: ObjectId
-    country_id: ObjectId
+    _id: str
+    country_id: str
     name: str
     acronym: str
 
-# class User(BaseModel):
-#     id: ObjectId
-#     email: str
-#     password: str
+class User(BaseModel):
+    id: str
+    email: str
+    password: str
