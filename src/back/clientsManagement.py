@@ -23,8 +23,11 @@ countriesRouter = APIRouter()
 
 @studentsRouter.get("/students/") # y
 async def get_students():
-    print (await db["students"].find().to_list(1000))
-    return await db["students"].find().to_list(1000)
+    students = await db["students"].find().to_list(1000)
+    for student in students:
+        student["_id"] = str(student["_id"])
+        student["career_id"] = str(student["career_id"])
+    return students
 
 @studentsRouter.post("/students/", response_model=Student) # y
 async def create_student(student: Student):
