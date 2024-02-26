@@ -1,7 +1,7 @@
 import './App.scss';
 import React, {useEffect, useState} from 'react';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import {supabase} from './supabase/client.js';
+//import {supabase} from './supabase/client.js';
 import SignUp from "./pages/SignUp/SignUp";
 import LogIn from "./pages/LogIn/LogIn";
 import NotFound from "./pages/NotFound/NotFound";
@@ -20,19 +20,19 @@ import EditExchange from "./pages/StudentsInExchanges/Edit/EditExchange";
 const App = () => {
     const [session, setSession] = useState(null)
 
-    useEffect(() => {
-        supabase.auth.getSession().then(({data: {session}}) => {
-            setSession(session)
-        })
+    // useEffect(() => {
+    //     supabase.auth.getSession().then(({data: {session}}) => {
+    //         setSession(session)
+    //     })
 
-        const {
-            data: {subscription},
-        } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session)
-        })
+    //     const {
+    //         data: {subscription},
+    //     } = supabase.auth.onAuthStateChange((_event, session) => {
+    //         setSession(session)
+    //     })
 
-        return () => subscription.unsubscribe()
-    }, [])
+    //     return () => subscription.unsubscribe()
+    // }, [])
 
     return (
         <div className="App">

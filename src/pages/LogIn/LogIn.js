@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import './LogIn.scss';
-import {supabase} from "../../supabase/client";
+//import {supabase} from "../../supabase/client";
 import {useNavigate} from "react-router-dom";
 import {FormControl, InputAdornment, InputLabel, OutlinedInput} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
@@ -34,17 +34,27 @@ export default function LogIn() {
     };
 
     const logIn = async (email, password) => {
-        const {error} = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-        })
-        if (error) {
-            console.log(error);
+        try {
+            const response = await fetch('http://127.0.0.1:8001/', { // endpoint to be defined (login endpoint, still not defined in the backend)
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({email, password}),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Login failed');
+            }
+    
+            const data = await response.json();
+            console.log('Login successful:', data);
+            navigate('/'); // Navigate to homepage or dashboard
+        } catch (error) {
+            console.error('Error during login:', error);
             setInvalidLogin(true);
-        } else {
-            navigate('/');
         }
-    }
+    };    
 
     const handleSubmit = async (event) => {
         event.preventDefault();

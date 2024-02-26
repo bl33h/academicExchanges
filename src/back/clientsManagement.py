@@ -1,9 +1,11 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from dotenv import load_dotenv
-from fastapi import APIRouter
-from models import Student, Country, Exchange, Career, University, User
-from typing import List
+from fastapi import APIRouter, HTTPException, status, Depends
+from models import Student, Country, Exchange, Career, University, User, UserLogin
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from passlib.hash import bcrypt
+from passlib.context import CryptContext
 
 load_dotenv()
 MONGODB_URI = os.environ['MONGODB_URI']
@@ -17,6 +19,7 @@ majorsRouter = APIRouter()
 usersRouter = APIRouter()
 studentsRouter = APIRouter()
 countriesRouter = APIRouter()
+usersLoginRouter = APIRouter()
 
 @studentsRouter.get("/students/") # y
 async def get_students():

@@ -33,3 +33,7 @@ class User(BaseModel):
     id: str
     email: str
     password: str
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
