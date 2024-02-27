@@ -6,6 +6,9 @@ import NotFound from "./pages/NotFound/NotFound";
 import Exchanges from "./pages/Exchanges/Exchanges";
 import NewExchange from "./pages/Exchanges/NewExchange";
 import EditExchange from "./pages/Exchanges/EditExchange";
+import Students from "./pages/Students/Students";
+import NewStudent from "./pages/Students/NewStudent";
+import EditStudent from "./pages/Students/EditStudent";
 import NavBar from "./components/NavBars/NavBar";
 
 
@@ -22,9 +25,9 @@ const App = () => {
                         <Route path="/exchanges/new" element={<NewExchange/>}/>
                         <Route path="/exchanges/edit/:id" element={<EditExchange/>}/>
                         {/*STUDENTS*/}
-                        {/*<Route path="/students" element={<Students/>}/>*/}
-                        {/*<Route path="/students/new" element={<NewStudent/>}/>*/}
-                        {/*<Route path="/students/edit/:id" element={<EditStudent/>}/>*/}
+                        <Route path="/students" element={<Students/>}/>
+                        <Route path="/students/new" element={<NewStudent/>}/>
+                        <Route path="/students/edit/:id" element={<EditStudent/>}/>
                         {/*/!*UNIVERSITIES*!/*/}
                         {/*<Route path="/universities" element={<Universities/>}/>*/}
                         {/*<Route path={"/universities/new"} element={<NewUniversity/>}/>*/}
