@@ -439,6 +439,6 @@ async def get_modalities():
     return modalities
 
 @statusRouter.get("/status/") # y
-async def get_modalities():
+async def get_status():
     modalities = await db["exchanges"].distinct("details.status")
     return modalities

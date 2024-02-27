@@ -33,6 +33,7 @@ class Student(BaseModel):
     name: str
     email: str
     career_id: str
+    carnet: str
 
 class University(BaseModel):
     _id: str
