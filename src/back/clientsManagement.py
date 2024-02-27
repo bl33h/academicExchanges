@@ -3,7 +3,7 @@ from bson import ObjectId
 from dotenv import load_dotenv
 from fastapi import APIRouter, Path
 from motor.motor_asyncio import AsyncIOMotorClient
-from models import Student, Country, Exchange, Career, University, User, Modality, Status
+from models import Student, Country, Exchange, Career, University
 
 load_dotenv()
 MONGODB_URI = os.environ['MONGODB_URI']
@@ -14,7 +14,6 @@ db = client['Intercambios']
 universitiesRouter = APIRouter()
 exchangesRouter = APIRouter()
 majorsRouter = APIRouter()
-usersRouter = APIRouter()
 studentsRouter = APIRouter()
 countriesRouter = APIRouter()
 modalityRouter = APIRouter()
@@ -305,6 +304,46 @@ async def delete_exchange(exchange_id: str):
     else:
         return {"error": "Exchange not found"}, 404
 
+@universitiesRouter.get("/universities/{university_id}") # y
+async def get_universities_by_id(university_id: str = Path(...)):
+    pipeline = [
+        {
+            "$match": {
+                "_id": ObjectId(university_id)
+            }
+        },
+        {
+            "$lookup": {
+                "from": "countries",
+                "localField": "country_id",
+                "foreignField": "_id",
+                "as": "country_info"
+            }
+        },
+        {
+            "$unwind": "$country_info"
+        },
+        {
+            "$project":{
+                "_id": {"$toString": "$_id"},
+                "name": "$name",
+                "acronym": "$acronym",
+                "country_id": {"$toString": "$country_id"},
+                "country": "$country_info"  
+            }
+        }
+    ]
+    universities = await db["universities"].aggregate(pipeline).to_list(1)
+    if universities:
+        university = universities[0]
+        university["_id"] = str(university["_id"])
+        university["country_id"] = str(university["country_id"])
+        university["country"]["_id"] = str(university["country"]["_id"])
+        university["country"]["continent"]["_id"] = str(university["country"]["continent"]["_id"])
+        return university
+    else:
+        return {"error": "Universidad no encontrado"}, 404
+
 @universitiesRouter.get("/universities/") # y
 async def get_universities():
     pipeline = [
@@ -339,6 +378,9 @@ async def get_universities():
 
 @universitiesRouter.post("/universities/", response_model=University) # y
 async def create_university(university: University):
+    university_dict = university.dict(by_alias=True)
+    university_dict["country_id"] = ObjectId(university_dict["country_id"])
+    university_dict["_id"] = ObjectId(university_dict["_id"])
     new_university = await db["universities"].insert_one(university.dict())
     created_university = await db["universities"].find_one({"_id": new_university.inserted_id})
     return created_university
@@ -377,19 +419,6 @@ async def delete_university(university_id: str):
         return {"message": "University and related data successfully deleted"}
     else:
         return {"error": "University not found"}, 404
-
-
-@usersRouter.get("/users/") # y
-async def get_users():
-    users = await db["users"].find().to_list(1000)
-    print(users)
-    return users
-
-@usersRouter.post("/users/", response_model=User) # y
-async def create_user(user: User):
-    new_user = await db["users"].insert_one(user.dict())
-    created_user = await db["users"].find_one({"_id": new_user.inserted_id})
-    return created_user
 
 @modalityRouter.get("/modalities/") # y
 async def get_modalities():
