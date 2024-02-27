@@ -393,7 +393,7 @@ async def get_universities():
 async def create_university(university: University):
     university_dict = university.dict(by_alias=True)
     university_dict["country_id"] = ObjectId(university_dict["country_id"])
-    new_university = await db["universities"].insert_one(university.dict())
+    new_university = await db["universities"].insert_one(university_dict)
     created_university = await db["universities"].find_one({"_id": new_university.inserted_id})
     return created_university
 
