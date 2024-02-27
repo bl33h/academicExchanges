@@ -187,7 +187,7 @@ async def create_career(career: Career):
 
 @exchangesRouter.get("/exchanges/page/{page_id}")
 async def get_exchanges(page_id: int = Path(...)):
-    skip_count = page_id * 16
+    skip_count = page_id * 15
     pipeline = [
         {
             "$lookup": {
@@ -225,7 +225,7 @@ async def get_exchanges(page_id: int = Path(...)):
             "$skip": skip_count
         },
         {
-            "$limit": 15
+            "$limit": 16
         }
     ]
 
