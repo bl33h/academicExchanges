@@ -20,10 +20,35 @@ countriesRouter = APIRouter()
 
 @studentsRouter.get("/students/") # y
 async def get_students():
-    students = await db["students"].find().to_list(1000)
+
+    pipeline = [
+        {
+            "$lookup": {
+                "from": "careers",
+                "localField": "career_id",
+                "foreignField": "_id",
+                "as": "career_info"
+            }
+        },
+        {
+            "$unwind": "$career_info"
+        },
+        {
+            "$project":{
+                "_id": {"$toString": "$_id"},
+                "name": "$name",
+                "email": "$email",
+                "career_id": {"$toString": "$career_id"},
+                "career": "$career_info"
+            }
+        }
+    ]
+    students = await db["students"].aggregate(pipeline).to_list(1000)
     for student in students:
         student["_id"] = str(student["_id"])
         student["career_id"] = str(student["career_id"])
+        student["career"]["_id"] = str(student["career"]["_id"])
+        student["career"]["faculty"]["_id"] = str(student["career"]["faculty"]["_id"])
     return students
 
 @studentsRouter.get("/students/{student_id}")
