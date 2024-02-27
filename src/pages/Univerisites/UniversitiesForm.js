@@ -67,12 +67,26 @@ const UniversityForm = ({id = -1}) => {
     }, [university.countryId]);
 
     const [countries, setCountries] = useState([]);
-    // useEffect(() => {
-    //     getCountriesList().then((countriesList) => {
-    //         setCountries(countriesList);
-    //         setLoading(false);
-    //     });
-    // }, []);
+    const fetchCountries = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/countries');
+            const data = await response.json();
+            return data.map((country) => {
+                return {
+                    id: country._id,
+                    name: country.name,
+                }
+            });
+        } catch (error) {
+            console.error('Eror:', error);
+        }
+    }
+    useEffect(() => {
+        fetchCountries().then((countriesList) => {
+            setCountries(countriesList);
+            setLoading(false);
+        });
+    }, []);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
