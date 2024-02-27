@@ -87,6 +87,7 @@ export default function Table() {
         try {
             const response = await fetch('http://127.0.0.1:8001/universities');
             const data = await response.json();
+            console.log(data)
             return data.map((university) => {
                 return {
                     id: university._id,

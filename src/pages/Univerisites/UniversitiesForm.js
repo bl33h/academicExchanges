@@ -88,22 +88,48 @@ const UniversityForm = ({id = -1}) => {
         });
     }, []);
 
+    const insertUniversity = async (university) => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/universities', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(university),
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    const doesUniversityExist = async (name) => {
+        try {
+            const response = await fetch(`http://127.0.0.1:8001/universities/by_name/` + name);
+            const data = await response.json();
+            console.log(data[1])
+            return data[1] != 404;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         setFirstTry(false);
         if (university.name !== '' && university.countryId !== '') {
             try {
-                // const doesExist = await doesUniversityExist(university.name);
-                const doesExist = false;
+                const doesExist = await doesUniversityExist(university.name);
                 if (doesExist) {
                     throw new Error(`Ya existe una universidad con el nombre ${university.name}`);
                 } else {
                     if (isNewUniversity) {
-                        // await insertUniversity({
-                        //     name: university.name,
-                        //     short_name: university.shortName,
-                        //     country_id: university.countryId,
-                        // });
+                        console.log('university:', university);
+                        await insertUniversity({
+                            name: university.name,
+                            acronym: university.shortName,
+                            country_id: university.countryId,
+                        });
                         Swal.fire({
                             icon: 'success',
                             title: '¡Muy Bien!',
