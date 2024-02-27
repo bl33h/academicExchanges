@@ -23,7 +23,7 @@ import MenuItem from "@mui/material/MenuItem";
 // } from "../../supabase/StudentQueries";
 // import {getCareersByFaculty, getFaculties} from "../../supabase/CareersQueries";
 import EditIcon from '@mui/icons-material/Edit';
-import Swal from 'sweetalert2'
+import Swal from "sweetalert2";
 
 
 const StudentsForm = ({id = -1}) => {
@@ -37,30 +37,39 @@ const StudentsForm = ({id = -1}) => {
         campusId: "",
         genderId: "",
     });
-    // useEffect(() => {
-    //     if (!isNewStudent) {
-    //         getStudentById(id).then((student) => {
-    //             setStudent({
-    //                 id: student.id,
-    //                 name: student.name,
-    //                 mail: student.mail,
-    //                 facultyId: student.faculty_id,
-    //                 careerId: student.career_id,
-    //                 genderId: student.gender_id,
-    //                 gender: student.gender,
-    //                 campus: student.campus,
-    //                 campusId: student.campus_id
-    //             })
-    //         }).catch((error) => {
-    //             setErrorOccurred(true);
-    //             setError(error);
-    //         })
-    //     }
-    // }, []);
+    const getStudentById = async (id) => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/students/' + id);
+            return await response.json();
+        } catch (error) {
+            console.log('Error:', error);
+        }
+    }
+    useEffect(() => {
+        if (!isNewStudent) {
+
+            // getStudentById(id).then((student) => {
+            //     setStudent({
+            //         id: student.id,
+            //         name: student.name,
+            //         mail: student.mail,
+            //         facultyId: student.faculty_id,
+            //         careerId: student.career_id,
+            //         genderId: student.gender_id,
+            //         gender: student.gender,
+            //         campus: student.campus,
+            //         campusId: student.campus_id
+            //     })
+            // }).catch((error) => {
+            //     setErrorOccurred(true);
+            //     setError(error);
+            // })
+        }
+    }, []);
 
     const [errorOccurred, setErrorOccurred] = useState(false);
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [firstTry, setFirstTry] = useState(true);
 
     const [isIdEmpty, setIsIdEmpty] = useState(false);
@@ -114,7 +123,7 @@ const StudentsForm = ({id = -1}) => {
 
     const [faculties, setFaculties] = useState([]);
     const fetchFaculties = async () => {
-        try{
+        try {
             const response = await fetch('http://127.0.0.1:8001/careers/');
             const data = await response.json();
             return data.map((faculty) => {
@@ -162,17 +171,44 @@ const StudentsForm = ({id = -1}) => {
     }, [student.facultyId]);
 
     // Checks if all the data has been fetched
-    // useEffect(() => {
-    //     if(careers && campus && genders){
-    //         setLoading(false);
-    //     }
-    // }, [careers, campus, genders]);
+    useEffect(() => {
+        if (faculties.length > 0) {
+            setLoading(false);
+        }
+    }, [faculties, careers]);
 
     const navigate = useNavigate();
 
 
     const isDataValid = () => {
-        return student.id !== "" && student.name !== "" && student.mail !== "" && student.facultyId !== "" && student.careerId !== "" && student.campusId !== "" && student.genderId !== "";
+        return student.id !== "" && student.name !== "" && student.mail !== "" && student.facultyId !== "" && student.careerId !== "";
+    }
+
+    const doesStudentExist = async (id) => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/students/' + id);
+            const data = await response.json();
+            return data[1] !== 404;
+        } catch (error) {
+            console.error('Error:', error);
+
+        }
+    }
+
+    const insertStudent = async (student) => {
+        try {
+            console.log(student)
+            const response = await fetch('http://127.0.0.1:8001/students/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(student)
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 
     const handleSubmit = async (event) => {
@@ -180,36 +216,40 @@ const StudentsForm = ({id = -1}) => {
         setFirstTry(false);
         try {
             if (isNewStudent) {
-                console.log("INSERTING STUDENT")
-                // const doesExist = await doesStudentExist(id);
-                // if (doesExist) { // Rise error
-                //     throw new Error(`El estudiante con carné "${id}" ya existe`);
-                // }
-                // if (!isDataValid()) {
-                //     throw new Error('Hay campos vacíos');
-                // }
-                // insertStudent({
-                //     id: student.id,
-                //     name: student.name,
-                //     mail: student.mail,
-                //     career_id: student.careerId,
-                //     gender: student.genderId,
-                //     campus_id: student.campusId
-                // }).then(() => {
-                //     Swal.fire({
-                //         icon: 'success',
-                //         title: '¡Muy Bien!',
-                //         text: 'Estudiante registrado exitosamente',
-                //         showConfirmButton: false,
-                //         timer: 1500
-                //     });
-                //     setTimeout(() => {
-                //         navigate('/estudiantes');
-                //     }, 1500);
-                // }).catch((error) => {
-                //     setErrorOccurred(true);
-                //     setError(error);
-                // })
+                // Pad the student id
+                const new_student = {
+                    ...student,
+                    carnet: student.id.padStart(24, '0'),
+                    careerId: student.careerId.padStart(24, '0')
+                }
+                const doesExist = await doesStudentExist(new_student.id);
+                if (doesExist) { // Rise error
+                    throw new Error(`El estudiante con carné "${id}" ya existe`);
+                }
+
+                if (!isDataValid()) {
+                    throw new Error('Hay campos vacíos');
+                }
+                insertStudent({
+                    carnet: new_student.carnet,
+                    name: new_student.name,
+                    email: new_student.mail,
+                    career_id: new_student.careerId,
+                }).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Muy Bien!',
+                        text: 'Estudiante registrado exitosamente',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    setTimeout(() => {
+                        navigate('/students');
+                    }, 1500);
+                }).catch((error) => {
+                    setErrorOccurred(true);
+                    setError(error);
+                })
             } else {
                 console.log(student)
                 // updateStudent({
