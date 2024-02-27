@@ -113,40 +113,53 @@ const StudentsForm = ({id = -1}) => {
     }, [student.genderId, firstTry]);
 
     const [faculties, setFaculties] = useState([]);
-    // useEffect(() => {
-    //     getFaculties().then(
-    //         (faculties) => {
-    //             setFaculties(faculties);
-    //         }
-    //     )
-    // }, []);
+    const fetchFaculties = async () => {
+        try{
+            const response = await fetch('http://127.0.0.1:8001/careers/');
+            const data = await response.json();
+            return data.map((faculty) => {
+                return {
+                    id: faculty._id,
+                    short_name: faculty.short_name,
+                }
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    useEffect(() => {
+        fetchFaculties().then(
+            (faculties) => {
+                setFaculties(faculties);
+            }
+        )
+    }, []);
 
     const [careers, setCareers] = useState([]);
-    // useEffect(() => {
-    //     getCareersByFaculty(student.facultyId).then(
-    //         (careers) => {
-    //             setCareers(careers);
-    //         }
-    //     )
-    // }, [student.facultyId]);
-
-    const [campus, setCampus] = useState([]);
-    // useEffect(() => {
-    //     getCampuses().then(
-    //         (campus) => {
-    //             setCampus(campus);
-    //         }
-    //     )
-    // }, []);
-
-    const [genders, setGenders] = useState([]);
-    // useEffect(() => {
-    //     getGenders().then(
-    //         (genders) => {
-    //             setGenders(genders);
-    //         }
-    //     )
-    // }, []);
+    const fetchCareers = async (facultyId) => {
+        if (facultyId === "") {
+            return [];
+        }
+        try {
+            const response = await fetch('http://127.0.0.1:8001/careers/' + facultyId);
+            const data = await response.json();
+            return data.map((career) => {
+                return {
+                    id: career._id,
+                    name: career.name,
+                }
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    useEffect(() => {
+        fetchCareers(student.facultyId).then(
+            (careers) => {
+                setCareers(careers);
+            }
+        )
+    }, [student.facultyId]);
 
     // Checks if all the data has been fetched
     // useEffect(() => {
@@ -356,60 +369,6 @@ const StudentsForm = ({id = -1}) => {
                                             ) : (
                                                 <MenuItem value="">
                                                     No hay carreras disponibles
-                                                </MenuItem>
-                                            )}
-                                        </TextField>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            id="genders"
-                                            select
-                                            label="Género"
-                                            fullWidth
-                                            name="genders"
-                                            value={student.genderId}
-                                            error={isGenderEmpty}
-                                            helperText={isGenderEmpty? 'Este campo es requerido' : ''}
-                                            onChange={(e) => {
-                                                setStudent({...student, genderId: e.target.value});
-                                            }}
-                                        >
-                                            {genders ? (
-                                                genders.map((gender) => (
-                                                    <MenuItem key={gender.id} value={gender.id}>
-                                                        {gender.genero}
-                                                    </MenuItem>
-                                                ))
-                                            ) : (
-                                                <MenuItem value="">
-                                                    No hay géneros disponibles
-                                                </MenuItem>
-                                            )}
-                                        </TextField>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            id="campus"
-                                            select
-                                            label="Campus"
-                                            fullWidth
-                                            name="campus"
-                                            value={student.campusId}
-                                            error={isCampusEmpty}
-                                            helperText={isCampusEmpty ? 'Este campo es requerido' : ''}
-                                            onChange={(e) => {
-                                                setStudent({...student, campusId: e.target.value});
-                                            }}
-                                        >
-                                            {campus ? (
-                                                campus.map((campus) => (
-                                                    <MenuItem key={campus.id} value={campus.id}>
-                                                        {campus.nombre}
-                                                    </MenuItem>
-                                                ))
-                                            ) : (
-                                                <MenuItem value="">
-                                                    No hay campus disponibles
                                                 </MenuItem>
                                             )}
                                         </TextField>
