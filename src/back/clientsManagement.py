@@ -3,7 +3,7 @@ from bson import ObjectId
 from dotenv import load_dotenv
 from fastapi import APIRouter, Path
 from motor.motor_asyncio import AsyncIOMotorClient
-from models import Student, Country, Exchange, Career, University, User
+from models import Student, Country, Exchange, Career, University, User, Modality, Status
 
 load_dotenv()
 MONGODB_URI = os.environ['MONGODB_URI']
@@ -17,6 +17,8 @@ majorsRouter = APIRouter()
 usersRouter = APIRouter()
 studentsRouter = APIRouter()
 countriesRouter = APIRouter()
+modalityRouter = APIRouter()
+statusRouter = APIRouter()
 
 @studentsRouter.get("/students/") # y
 async def get_students():
@@ -388,3 +390,13 @@ async def create_user(user: User):
     new_user = await db["users"].insert_one(user.dict())
     created_user = await db["users"].find_one({"_id": new_user.inserted_id})
     return created_user
+
+@modalityRouter.get("/modalities/") # y
+async def get_modalities():
+    modalities = await db["exchanges"].distinct("details.modality")
+    return modalities
+
+@statusRouter.get("/status/") # y
+async def get_modalities():
+    modalities = await db["exchanges"].distinct("details.status")
+    return modalities

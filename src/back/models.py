@@ -33,3 +33,9 @@ class User(BaseModel):
     id: str
     email: str
     password: str
+
+class Modality(BaseModel):
+    modality: str
+
+class Status(BaseModel):
+    status: str
