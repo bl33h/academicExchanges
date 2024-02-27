@@ -109,7 +109,7 @@ async def delete_student(student_id: str):
 
 @countriesRouter.get("/countries/") # y
 async def get_countries():
-    countries = await db["countries"].find().to_list(1000)
+    countries = await db["countries"].find().sort("name").to_list(1000)
     for country in countries:
         country["_id"] = str(country["_id"])
         country["continent"]["_id"] = str(country["continent"]["_id"])
@@ -380,7 +380,6 @@ async def get_universities():
 async def create_university(university: University):
     university_dict = university.dict(by_alias=True)
     university_dict["country_id"] = ObjectId(university_dict["country_id"])
-    university_dict["_id"] = ObjectId(university_dict["_id"])
     new_university = await db["universities"].insert_one(university.dict())
     created_university = await db["universities"].find_one({"_id": new_university.inserted_id})
     return created_university
