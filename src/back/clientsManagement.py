@@ -69,9 +69,9 @@ async def get_student_by_id(student_id: str = Path(...)):
 async def create_student(student: Student):
     # Convierte las cadenas _id y career_id a ObjectId
     student_dict = student.dict(by_alias=True)
+    print(student_dict)
     carnet = student_dict["carnet"]
-    new_id = np.zeros(24, carnet)
-    student_dict["_id"] = ObjectId(new_id)
+    student_dict["_id"] = ObjectId(carnet)
     student_dict["career_id"] = ObjectId(student_dict["career_id"])
 
     new_student = await db["students"].insert_one(student_dict)
