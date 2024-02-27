@@ -57,13 +57,12 @@ const ExchangeForm = ({id = -1}) => {
         try {
             const response = await fetch('http://127.0.0.1:8001/modalities');
             const data = await response.json();
-            const enumeratedData = data.map((item, index) => {
+            return data.map((item, index) => {
                 return {
                     id: index + 1,
                     modality: item
                 }
             });
-            return enumeratedData;
         } catch (error) {
             setErrorOccurred(true);
             setError(error);
@@ -79,7 +78,62 @@ const ExchangeForm = ({id = -1}) => {
     }, []);
 
     const [states, setStates] = useState([]);
+    const fetchStates = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/status');
+            const data = await response.json();
+            return data.map((item, index) => {
+                return {
+                    id: index + 1,
+                    state: item
+                }
+            });
+        } catch (error) {
+            setErrorOccurred(true);
+            setError(error);
+        }
+    }
+    useEffect(() => {
+        fetchStates().then((data) => {
+            setStates(data);
+        }).catch((error) => {
+            setErrorOccurred(true);
+            setError(error);
+        });
+    }, []);
+
     const [universities, setUniversities] = useState([]);
+    const fetchUniversities = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/universities');
+            const data = await response.json();
+            return data.map((university) => {
+                return {
+                    id: university._id,
+                    label: university.name,
+                }
+            });
+
+        } catch (error) {
+            setErrorOccurred(true);
+            setError(error);
+        }
+    }
+    useEffect(() => {
+        fetchUniversities().then((data) => {
+            setUniversities(data);
+        }).catch((error) => {
+            setErrorOccurred(true);
+            setError(error);
+        });
+    } , []);
+
+    // Check if all the data has been fetched
+    useEffect(() => {
+        if (modalities.length > 0 && states.length > 0 && universities.length > 0) {
+            setLoading(false);
+        }
+    }, [modalities, states, universities]);
 
     const isDataValid = () => {
         return exchange.year !== '' &&
@@ -198,7 +252,7 @@ const ExchangeForm = ({id = -1}) => {
                                             value={exchange.studentId}
                                             InputLabelProps={{shrink: true}}
                                             error={isStudentEmpty}
-                                            helperText={isStudentEmpty? 'Este campo es requerido' : ''}
+                                            helperText={isStudentEmpty ? 'Este campo es requerido' : ''}
                                             onChange={(e) => {
                                                 setExchange({...exchange, studentId: e.target.value});
                                             }}
