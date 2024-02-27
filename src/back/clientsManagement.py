@@ -186,7 +186,8 @@ async def create_career(career: Career):
     return created_career
 
 @exchangesRouter.get("/exchanges/")
-async def get_exchanges():
+async def get_exchanges(i):
+    skip_count = i * 15
     pipeline = [
         {
             "$lookup": {
@@ -219,6 +220,12 @@ async def get_exchanges():
                 "student": "$student_info",
                 "university": "$uni_info"
             }
+        },
+        {
+            "$skip": skip_count
+        },
+        {
+            "$limit": 15
         }
     ]
 
