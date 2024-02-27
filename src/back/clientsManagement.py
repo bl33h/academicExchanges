@@ -177,6 +177,62 @@ async def get_exchanges():
     
     return exchanges
 
+@exchangesRouter.get("/exchanges/{exchange_id}")
+async def get_exchange_by_id(exchange_id: str = Path(...)):
+    pipeline = [
+        {
+            "$match": {
+                "_id": ObjectId(exchange_id)
+            }
+        },
+        {
+            "$lookup": {
+                "from": "students",
+                "localField": "student_id",
+                "foreignField": "_id",
+                "as": "student_info"
+            }
+        },
+        {
+            "$unwind": "$student_info"
+        },
+        {
+            "$lookup": {
+                "from": "universities",
+                "localField": "university_id",
+                "foreignField": "_id",
+                "as": "uni_info"
+            }
+        },
+        {
+            "$unwind": "$uni_info"
+        },
+        {
+            "$project": {
+                "_id": {"$toString": "$_id"},
+                "student_id": {"$toString": "$student_id"},
+                "university_id": {"$toString": "$university_id"},
+                "details": "$details",
+                "student": "$student_info",
+                "university": "$uni_info"
+            }
+        }
+    ]
+
+    exchange = await db["exchanges"].aggregate(pipeline).to_list(1)
+
+    if exchange:
+        exchange = exchange[0]  # Tomar el primer elemento de la lista
+        exchange["student"]["_id"] = str(exchange["student"]["_id"])
+        exchange["student"]["career_id"] = str(exchange["student"]["career_id"])
+        exchange["university"]["_id"] = str(exchange["university"]["_id"])
+        exchange["university"]["country_id"] = str(exchange["university"]["country_id"])
+
+        return exchange
+    else:
+        return {"error": "Intercambio no encontrado"}, 404
+
+
 @exchangesRouter.post("/exchanges/", response_model=Exchange)
 async def create_exchange(exchange: Exchange):
     new_exchange = await db["exchanges"].insert_one(exchange.dict())
