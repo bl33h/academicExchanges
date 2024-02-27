@@ -275,10 +275,34 @@ async def delete_exchange(exchange_id: str):
 
 @universitiesRouter.get("/universities/") # y
 async def get_universities():
-    universities = await db["universities"].find().to_list(1000)
+    pipeline = [
+        {
+            "$lookup": {
+                "from": "countries",
+                "localField": "country_id",
+                "foreignField": "_id",
+                "as": "country_info"
+            }
+        },
+        {
+            "$unwind": "$country_info"
+        },
+        {
+            "$project":{
+                "_id": {"$toString": "$_id"},
+                "name": "$name",
+                "acronym": "$acronym",
+                "country_id": {"$toString": "$country_id"},
+                "country": "$country_info"
+            }
+        }
+    ]
+    universities = await db["universities"].aggregate(pipeline).to_list(1000)
     for university in universities:
         university["_id"] = str(university["_id"])
         university["country_id"] = str(university["country_id"])
+        university["country"]["_id"] = str(university["country"]["_id"])
+        university["country"]["continent"]["_id"] = str(university["country"]["continent"]["_id"])
     return universities
 
 @universitiesRouter.post("/universities/", response_model=University) # y
