@@ -185,9 +185,8 @@ async def create_career(career: Career):
     created_career = await db["careers"].find_one({"_id": new_career.inserted_id})
     return created_career
 
-@exchangesRouter.get("/exchanges/page/{page_id}")
-async def get_exchanges(page_id: int = Path(...)):
-    skip_count = page_id * 15
+@exchangesRouter.get("/exchanges/")
+async def get_exchanges():
     pipeline = [
         {
             "$lookup": {
@@ -220,12 +219,6 @@ async def get_exchanges(page_id: int = Path(...)):
                 "student": "$student_info",
                 "university": "$uni_info"
             }
-        },
-        {
-            "$skip": skip_count
-        },
-        {
-            "$limit": 16
         }
     ]
 
