@@ -143,11 +143,41 @@ async def delete_country(country_id: str):
         return {"error": "País no encontrado"}, 404
     
 @majorsRouter.get("/careers/") # y
-async def get_careers():
-    careers = await db["careers"].find().to_list(1000)
-    print(careers)
-    return careers
+async def get_faculties():
+    pipeline = [
+    {
+        "$unwind": "$faculty"
+    },
+    {
+        "$group": {
+            "_id": "$faculty._id",
+            "name": {"$first": "$faculty.name"},
+            "short_name": {"$first": "$faculty.short_name"}
+        }
+    },
+    {
+        "$project": {
+            "_id": {"$toString": "$_id"},
+            "name": "$name",
+            "short_name": "$short_name"
+        }
+    }
+]
 
+    faculties = await db["careers"].aggregate(pipeline).to_list(1000)
+
+    for faculty in faculties:
+        faculty["_id"] = str(faculty["_id"])
+    return faculties
+
+@majorsRouter.get("/careers/{faculty_id}") # y
+async def get_careers_by_faculty(faculty_id: str = Path(...)):
+    careers = await db["careers"].find({"faculty._id": ObjectId(faculty_id)}).to_list(1000)
+    for career in careers:
+        career["_id"] = str(career["_id"])
+        career["faculty"]["_id"] = str(career["faculty"]["_id"])
+    return careers
+    
 @majorsRouter.post("/careers/", response_model=Career) # y
 async def create_career(career: Career):
     new_career = await db["careers"].insert_one(career.dict())
@@ -345,6 +375,7 @@ async def delete_university(university_id: str):
         return {"message": "University and related data successfully deleted"}
     else:
         return {"error": "University not found"}, 404
+
 
 @usersRouter.get("/users/") # y
 async def get_users():
