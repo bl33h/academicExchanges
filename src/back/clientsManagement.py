@@ -185,7 +185,7 @@ async def create_career(career: Career):
     created_career = await db["careers"].find_one({"_id": new_career.inserted_id})
     return created_career
 
-@exchangesRouter.get("/exchanges/{page_id}")
+@exchangesRouter.get("/exchanges/page/{page_id}")
 async def get_exchanges(page_id: int = Path(...)):
     skip_count = page_id * 15
     pipeline = [
