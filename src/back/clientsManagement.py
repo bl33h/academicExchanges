@@ -179,7 +179,7 @@ async def get_careers_by_faculty(faculty_id: str = Path(...)):
         career["faculty"]["_id"] = str(career["faculty"]["_id"])
     return careers
     
-@majorsRouter.post("/careers/", response_model=Career) # y
+@majorsRouter.post("/careers/", response_model=Career)   # y
 async def create_career(career: Career):
     new_career = await db["careers"].insert_one(career.dict())
     created_career = await db["careers"].find_one({"_id": new_career.inserted_id})
@@ -187,7 +187,7 @@ async def create_career(career: Career):
 
 @exchangesRouter.get("/exchanges/page/{page_id}")
 async def get_exchanges(page_id: int = Path(...)):
-    skip_count = page_id * 15
+    skip_count = page_id * 16
     pipeline = [
         {
             "$lookup": {
