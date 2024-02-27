@@ -76,27 +76,31 @@ const columns = [
 ];
 
 export default function Table() {
-    const [rows, setRows] = useState([
-        {
-            id: 1,
-            name: 'Universidad de San Carlos',
-            short_name: 'USAC',
-            country: 'Guatemala',
+    const [rows, setRows] = useState([]);
+    const fetchData = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/universities');
+            const data = await response.json();
+            return data.map((university) => {
+                return {
+                    id: university._id,
+                    name: university.name,
+                    short_name: university.acronym,
+                    country: university.country.name,
+                }
+            });
         }
-    ]);
-
-    // useEffect(() => {
-    //     const fetchUniversities = async () => {
-    //         try {
-    //             const universities = await getUniversities();
-    //             setRows(universities);
-    //         } catch (error) {
-    //             console.error('Error fetching universities:', error);
-    //         }
-    //     };
-    //
-    //     fetchUniversities();
-    // }, []);
+        catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    useEffect(() => {
+        fetchData().then((data) => {
+            setRows(data);
+        }).catch((error) => {
+            console.error('Error fetching universities:', error)
+        });
+    }, []);
 
     return (
         <>

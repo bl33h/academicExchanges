@@ -19,7 +19,8 @@ const columns = [
                 icon={<EditIcon/>}
                 label="Editar"
                 onClick={() => {
-                    window.location.href = `/students/edit/${params.id}`;
+                    const paddedId = String(params.id).padStart(24, '0');
+                    window.location.href = `/students/edit/${paddedId}`;
                 }}
                 showInMenu
             />,
@@ -50,30 +51,36 @@ const columns = [
         headerName: 'Facultad',
         width: 100,
     },
-    {
-        field: 'gender',
-        headerName: 'Género',
-        width: 100,
-    },
-    {
-        field: 'campus',
-        headerName: 'Campus',
-        width: 200,
-    },
 ];
 
 export default function Table() {
-    const [rows, setRows] = useState([
-        {
-            id: 1,
-            name: 'John Doe',
-            mail: 'doe@gmail.com',
-            career: 'Ingeniería en Sistemas',
-            faculty: 'Ingeniería',
-            gender: 'Masculino',
-            campus: 'Tegucigalpa',
-        },
-    ]);
+    const [rows, setRows] = useState([]);
+    const fetchData = async () => {
+        try{
+            const response = await fetch('http://127.0.0.1:8001/students');
+            const data = await response.json();
+            return data.map((student) => {
+                return {
+                    id: student._id.replace(/^0+/, ''),
+                    name: student.name,
+                    mail: student.email,
+                    career: student.career.name,
+                    faculty: student.career.faculty.name,
+                }
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    useEffect(() => {
+        fetchData()
+            .then((data) => {
+                setRows(data);
+            })
+            .catch((error) => {
+                console.error('Error fetching students:', error);
+            });
+    }, []);
 
     return (
         <>
