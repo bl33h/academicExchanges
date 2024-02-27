@@ -10,6 +10,8 @@ import Students from "./pages/Students/Students";
 import NewStudent from "./pages/Students/NewStudent";
 import EditStudent from "./pages/Students/EditStudent";
 import Universities from "./pages/Univerisites/Universities";
+import NewUniversity from "./pages/Univerisites/NewUniversity";
+import EditUniversity from "./pages/Univerisites/EditUniversity";
 
 import NavBar from "./components/NavBars/NavBar";
 
@@ -32,8 +34,8 @@ const App = () => {
                         <Route path="/students/edit/:id" element={<EditStudent/>}/>
                         {/*UNIVERSITIES*/}
                         <Route path="/universities" element={<Universities/>}/>
-                        {/*<Route path={"/universities/new"} element={<NewUniversity/>}/>*/}
-                        {/*<Route path={"/universities/edit/:id"} element={<EditUniversity/>}/>*/}
+                        <Route path={"/universities/new"} element={<NewUniversity/>}/>
+                        <Route path={"/universities/edit/:id"} element={<EditUniversity/>}/>
                         {/*/!*STATISTICS*!/*/}
                         {/*<Route path="/summary" element={<Summary/>}/>*/}
                         <Route path="*" element={<NotFound/>}/>
