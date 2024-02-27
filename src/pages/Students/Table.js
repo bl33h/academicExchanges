@@ -19,7 +19,7 @@ const columns = [
                 icon={<EditIcon/>}
                 label="Editar"
                 onClick={() => {
-                    window.location.href = `/estudiantes/edit/${params.id}`;
+                    window.location.href = `/students/edit/${params.id}`;
                 }}
                 showInMenu
             />,
