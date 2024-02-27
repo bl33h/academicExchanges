@@ -53,6 +53,31 @@ const ExchangeForm = ({id = -1}) => {
     const [isUniversityEmpty, setIsUniversityEmpty] = useState(false);
 
     const [modalities, setModalities] = useState([]);
+    const fetchModalities = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/modalities');
+            const data = await response.json();
+            const enumeratedData = data.map((item, index) => {
+                return {
+                    id: index + 1,
+                    modality: item
+                }
+            });
+            return enumeratedData;
+        } catch (error) {
+            setErrorOccurred(true);
+            setError(error);
+        }
+    }
+    useEffect(() => {
+        fetchModalities().then((data) => {
+            setModalities(data);
+        }).catch((error) => {
+            setErrorOccurred(true);
+            setError(error);
+        });
+    }, []);
+
     const [states, setStates] = useState([]);
     const [universities, setUniversities] = useState([]);
 
