@@ -56,6 +56,43 @@ async def get_students():
 
 @studentsRouter.get("/students/{student_id}")
 async def get_student_by_id(student_id: str = Path(...)):
+    pipeline = [
+        {
+            "$match": {"_id" : ObjectId(student_id)}    
+        },
+        {
+            "$lookup": {
+                "from": "careers",
+                "localField": "career_id",
+                "foreignField": "_id",
+                "as": "career_info"
+            }
+        },
+        {
+            "$unwind": "$career_info"
+        },
+        {
+            "$lookup": {
+                "from": "faculties",
+                "localField": "career_info.faculty._id",
+                "foreignField": "_id",
+                "as": "faculty_info"
+            }
+        },
+        {
+            "$unwind": "$faculty_info"
+        },
+        {
+            "$project":{
+                "_id": {"$toString": "$_id"},
+                "name": "$name",
+                "email": "$email",
+                "career_id": {"$toString": "$career_id"},
+                "career": "$career_info",
+                "faculty": "$faculty_info"
+            }
+        }
+    ]
     student = await db["students"].find_one({"_id": ObjectId(student_id)})
 
     if student:
