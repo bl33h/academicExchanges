@@ -18,30 +18,36 @@ const handleDelete = (id) => {
         cancelButtonColor: '#d33',
         confirmButtonText: 'Si, eliminar',
         cancelButtonText: "Cancelar",
-    }).then((result) => {
+    }).then(async (result) => {
         if (result.isConfirmed) {
-            console.log('Eliminando', id)
-            // deleteUniversity(id).then(() => {
-            //     Swal.fire({
-            //         position: 'center',
-            //         icon: 'success',
-            //         title: 'Universidad Eliminada',
-            //         showConfirmButton: false,
-            //         timer: 1500
-            //     })
-            //     setTimeout(() => {
-            //         window.location.reload();
-            //     }, 1500);
-            // }).catch((error) => {
-            //     Swal.fire({
-            //         position: 'center',
-            //         icon: 'error',
-            //         title: `${error.message}`,
-            //         showConfirmButton: false,
-            //         timer: 1500
-            //     })
-            // })
+            const response = await fetch('http://127.0.0.1:8001/universities/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            if (response.status === 200) {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Universidad Eliminada',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'error',
+                    title: `${data.message}`,
+                    showConfirmButton: false,
+                    timer: 1500
+                })
         }
+    }
     })
 }
 
