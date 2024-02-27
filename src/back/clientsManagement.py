@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Path
 from motor.motor_asyncio import AsyncIOMotorClient
 from models import Student, Country, Exchange, Career, University
+from pymongo.collation import Collation
 
 load_dotenv()
 MONGODB_URI = os.environ['MONGODB_URI']
@@ -340,6 +341,18 @@ async def get_universities_by_id(university_id: str = Path(...)):
         university["country_id"] = str(university["country_id"])
         university["country"]["_id"] = str(university["country"]["_id"])
         university["country"]["continent"]["_id"] = str(university["country"]["continent"]["_id"])
+        return university
+    else:
+        return {"error": "Universidad no encontrado"}, 404
+    
+@universitiesRouter.get("/universities/by_name/{name}") # y
+async def get_universities_by_id(name: str = Path(...)):
+    collation = Collation(locale='en', strength=2)
+    universities = await db["universities"].find({"name": name}).collation(collation).to_list(1)
+    if universities:
+        university = universities[0]
+        university["_id"] = str(university["_id"])
+        university["country_id"] = str(university["country_id"])
         return university
     else:
         return {"error": "Universidad no encontrado"}, 404
