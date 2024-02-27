@@ -5,6 +5,7 @@ from fastapi import APIRouter, Path
 from motor.motor_asyncio import AsyncIOMotorClient
 from models import Student, Country, Exchange, Career, University
 from pymongo.collation import Collation
+import numpy as np
 
 load_dotenv()
 MONGODB_URI = os.environ['MONGODB_URI']
@@ -69,10 +70,7 @@ async def create_student(student: Student):
     # Convierte las cadenas _id y career_id a ObjectId
     student_dict = student.dict(by_alias=True)
     carnet = student_dict["carnet"]
-    new_id = ""
-    for i in range(0, 24 - len(carnet)):
-        new_id += "0"
-    new_id += carnet
+    new_id = np.zeros(24, carnet)
     student_dict["_id"] = ObjectId(new_id)
     student_dict["career_id"] = ObjectId(student_dict["career_id"])
 
