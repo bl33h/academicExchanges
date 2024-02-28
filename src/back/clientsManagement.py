@@ -253,6 +253,9 @@ async def get_exchanges():
                 "student": "$student_info",
                 "university": "$uni_info"
             }
+        },
+        {
+            "$sort": {"_id": -1}
         }
     ]
 
