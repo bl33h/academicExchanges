@@ -20,29 +20,38 @@ const handleDelete = (id) => {
         cancelButtonText: "Cancelar",
     }).then((result) => {
         if (result.isConfirmed) {
-            console.log("DELETED")
-            // deleteExchange(id).then(() => {
-            //     Swal.fire({
-            //         position: 'center',
-            //         icon: 'success',
-            //         title: 'Intercambio eliminado',
-            //         showConfirmButton: false,
-            //         timer: 1500
-            //     })
-            //     setTimeout(() => {
-            //         window.location.reload();
-            //     }, 1500);
-            // }).catch((error) => {
-            //     Swal.fire({
-            //         position: 'center',
-            //         icon: 'error',
-            //         title: `${error.message}`,
-            //         showConfirmButton: false,
-            //         timer: 1500
-            //     })
-            // })
+            deleteExchange(id).then(() => {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Intercambio eliminado',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }).catch((error) => {
+                Swal.fire({
+                    position: 'center',
+                    icon: 'error',
+                    title: `${error.message}`,
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            })
         }
     })
+}
+
+const deleteExchange = async (id) => {
+    try {
+        const response = await fetch(`http://127.0.0.1:8001/exchanges/${id}`, {
+            method: 'DELETE',
+        });
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 const columns = [
