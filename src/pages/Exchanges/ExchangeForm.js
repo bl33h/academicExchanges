@@ -28,20 +28,18 @@ const ExchangeForm = ({id = -1}) => {
     const [firstTry, setFirstTry] = useState(true);
 
     const [exchange, setExchange] = useState({
-        year: '',
-        semester: '',
-        studentId: '',
-        universityName: '',
-        universityId: null,
-        modalityName: '',
-        modalityId: '',
-        stateName: '',
-        stateId: '',
-        cycle: '',
-        date: '',
-        coursesUvg: '',
-        coursesExchange: '',
-        comments: '',
+        id: id ? id : '',
+        student_id: '',
+        university_name: '',
+        university_id: '',
+        details: {
+            year: '',
+            semester: '',
+            status: '',
+            start_date: '',
+            end_date: '',
+            comments: [],
+        }
     });
 
     const [isYearEmpty, setIsYearEmpty] = useState(false);
@@ -126,7 +124,7 @@ const ExchangeForm = ({id = -1}) => {
             setErrorOccurred(true);
             setError(error);
         });
-    } , []);
+    }, []);
 
     // Check if all the data has been fetched
     useEffect(() => {
@@ -136,14 +134,30 @@ const ExchangeForm = ({id = -1}) => {
     }, [modalities, states, universities]);
 
     const isDataValid = () => {
-        return exchange.year !== '' &&
-            exchange.semester !== '' &&
-            exchange.studentId !== ''
+        return exchange.student_id !== '' && exchange.university_id !== '';
+    }
+
+
+    const insertExchange = async (exchange) => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/exchanges', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(exchange)
+            });
+        } catch (error) {
+            setErrorOccurred(true);
+            setError(error);
+        }
     }
 
     const handleSubmit = async (event) => {
         setFirstTry(false);
         event.preventDefault();
+        console.log(exchange)
+
         try {
             if (!isDataValid()) {
                 throw new Error("Hay campos vacíos")
@@ -153,23 +167,34 @@ const ExchangeForm = ({id = -1}) => {
                 setIsStudentEmpty(true);
                 throw new Error("El estudiante no existe");
             }
-            const exchangeData = {
-                year: exchange.year,
-                semester: exchange.semester,
-                studentId: exchange.studentId,
-                universityId: exchange.universityId,
-            }
-            exchangeData.modalityId = exchange.modalityId === "" ? null : exchange.modalityId;
-            exchangeData.stateId = exchange.stateId === "" ? null : exchange.stateId;
-            exchangeData.cycle = exchange.cycle === "" ? null : exchange.cycle;
-            exchangeData.date = exchange.date === "" ? null : exchange.date;
-            exchangeData.coursesUvg = exchange.coursesUvg === "" ? null : exchange.coursesUvg;
-            exchangeData.coursesExchange = exchange.coursesExchange === "" ? null : exchange.coursesExchange;
-            exchangeData.comments = exchange.comments === "" ? null : exchange.comments;
             if (isNewExchange) {
-                console.log("Creating exchange")
+                const exchange_to_insert = {
+                    student_id: exchange.student_id,
+                    university_id: exchange.university_id,
+                    details: {
+                        year: exchange.details.year,
+                        semester: exchange.details.semester,
+                        modality: exchange.details.modality,
+                        status: exchange.details.status,
+                        start_date: exchange.details.start_date,
+                        end_date: exchange.details.end_date,
+                        comments: exchange.details.comments,
+                    }
+                }
+                insertExchange(exchange_to_insert).then(() => {
+                    Swal.fire({
+                        title: 'Intercambio registrado',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        navigate("/exchanges");
+                    });
+                }).catch((error) => {
+                    setErrorOccurred(true);
+                    setError(error);
+                });
             } else {
-                exchangeData.id = id;
+                exchange.id = id;
                 console.log("Editing exchange with id:", id)
             }
         } catch (error) {
@@ -218,11 +243,14 @@ const ExchangeForm = ({id = -1}) => {
                                             fullWidth
                                             autoFocus
                                             error={isYearEmpty}
-                                            value={exchange.year}
+                                            value={exchange.details.year}
                                             InputLabelProps={{shrink: true}}
                                             helperText={isYearEmpty ? 'Este campo es requerido' : ''}
                                             onChange={(e) => {
-                                                setExchange({...exchange, year: e.target.value});
+                                                setExchange({
+                                                    ...exchange,
+                                                    details: {...exchange.details, year: e.target.value}
+                                                });
                                             }}
                                         />
                                     </Grid>
@@ -233,12 +261,15 @@ const ExchangeForm = ({id = -1}) => {
                                             id="semester"
                                             label="Semestre"
                                             name="semester"
-                                            value={exchange.semester}
+                                            value={exchange.details.semester}
                                             InputLabelProps={{shrink: true}}
                                             error={isSemesterEmpty}
                                             helperText={isSemesterEmpty ? 'Este campo es requerido' : ''}
                                             onChange={(e) => {
-                                                setExchange({...exchange, semester: e.target.value});
+                                                setExchange({
+                                                    ...exchange,
+                                                    details: {...exchange.details, semester: e.target.value}
+                                                });
                                             }}
                                         />
                                     </Grid>
@@ -249,18 +280,18 @@ const ExchangeForm = ({id = -1}) => {
                                             id="student"
                                             label="Carné del Estudiante"
                                             name="student"
-                                            value={exchange.studentId}
+                                            value={exchange.student_id}
                                             InputLabelProps={{shrink: true}}
                                             error={isStudentEmpty}
                                             helperText={isStudentEmpty ? 'Este campo es requerido' : ''}
                                             onChange={(e) => {
-                                                setExchange({...exchange, studentId: e.target.value});
+                                                setExchange({...exchange, student_id: e.target.value});
                                             }}
                                         />
                                     </Grid>
                                     <Grid item xs={3} sm={3}>
                                         <ButtonCheckStudent
-                                            studentId={exchange.studentId}
+                                            studentId={exchange.student_id}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={12}>
@@ -270,7 +301,7 @@ const ExchangeForm = ({id = -1}) => {
                                             fullWidth
                                             id="university"
                                             name="university"
-                                            value={exchange.universityName ? exchange.universityName : null}
+                                            value={exchange.university_name ? exchange.university_name : null}
                                             isOptionEqualToValue={(option, value) => option.label === value}
                                             options={universities}
                                             renderInput={(params) =>
@@ -284,14 +315,14 @@ const ExchangeForm = ({id = -1}) => {
                                                 if (value) {
                                                     setExchange((prevExchange) => ({
                                                         ...prevExchange,
-                                                        universityId: value.id,
-                                                        universityName: value.label,
+                                                        university_id: value.id,
+                                                        university_name: value.label,
                                                     }));
                                                 } else {
                                                     setExchange((prevExchange) => ({
                                                         ...prevExchange,
-                                                        universityId: null,
-                                                        universityName: "",
+                                                        university_id: null,
+                                                        university_name: "",
                                                     }));
                                                 }
                                             }}
@@ -303,14 +334,17 @@ const ExchangeForm = ({id = -1}) => {
                                             <Select
                                                 labelId="modalities-label"
                                                 id="modalities"
-                                                value={exchange.modalityId ? exchange.modalityId : ''}
+                                                value={exchange.details.modality_id ? exchange.details.modality_id : ''}
                                                 label="modalities"
                                                 onChange={(event) => {
                                                     const selectedModality = modalities.find((modality) => modality.id === event.target.value);
                                                     setExchange((prevExchange) => ({
                                                         ...prevExchange,
-                                                        modalityName: selectedModality ? selectedModality.modality : '',
-                                                        modalityId: selectedModality ? selectedModality.id : ''
+                                                        details: {
+                                                            ...prevExchange.details,
+                                                            modality: selectedModality ? selectedModality.modality : '',
+                                                            modality_id: selectedModality ? selectedModality.id : ''
+                                                        }
                                                     }));
                                                 }}
                                             >
@@ -328,14 +362,17 @@ const ExchangeForm = ({id = -1}) => {
                                             <Select
                                                 labelId="states-label"
                                                 id="states"
-                                                value={exchange.stateId ? exchange.stateId : ''}
+                                                value={exchange.details.status_id ? exchange.details.status_id : ''}
                                                 label="Estado"
                                                 onChange={(event) => {
                                                     const selectedState = states.find((state) => state.id === event.target.value);
                                                     setExchange((prevExchange) => ({
                                                         ...prevExchange,
-                                                        stateId: selectedState ? selectedState.id : '',
-                                                        stateName: selectedState ? selectedState.state : ''
+                                                        details: {
+                                                            ...prevExchange.details,
+                                                            status: selectedState ? selectedState.state : '',
+                                                            status_id: selectedState ? selectedState.id : ''
+                                                        }
                                                     }));
                                                 }}
                                             >
@@ -349,53 +386,34 @@ const ExchangeForm = ({id = -1}) => {
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <TextField
-                                            name="cycle"
+                                            name="start_date"
                                             fullWidth
-                                            id="cycle"
-                                            label="Ciclo"
-                                            value={exchange.cycle}
+                                            id="start_date"
+                                            label="Fecha Inicio"
+                                            value={exchange.start_date}
                                             InputLabelProps={{shrink: true}}
                                             onChange={(e) => {
-                                                setExchange({...exchange, cycle: e.target.value});
+                                                setExchange({
+                                                    ...exchange,
+                                                    details: {...exchange.details, start_date: e.target.value}
+                                                });
                                             }}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <TextField
-                                            name="date"
+                                            name="end_date"
                                             fullWidth
-                                            id="date"
-                                            label="Fecha Viaje"
-                                            value={exchange.date}
+                                            id="end_date"
+                                            label="Fecha Fin"
+                                            value={exchange.end_date}
                                             InputLabelProps={{shrink: true}}
                                             onChange={(e) => {
-                                                setExchange({...exchange, date: e.target.value});
+                                                setExchange({
+                                                    ...exchange,
+                                                    details: {...exchange.details, end_date: e.target.value}
+                                                });
                                             }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6} sm={6}>
-                                        <TextField
-                                            fullWidth
-                                            id="coursesUvg"
-                                            label="Cursos UVG"
-                                            name="coursesUvg"
-                                            value={exchange.coursesUvg}
-                                            InputLabelProps={{shrink: true}}
-                                            onChange={(e) => setExchange({...exchange, coursesUvg: e.target.value})}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6} sm={6}>
-                                        <TextField
-                                            fullWidth
-                                            id="coursesExchange"
-                                            label="Cursos Intercambio"
-                                            name="coursesExchange"
-                                            value={exchange.coursesExchange}
-                                            InputLabelProps={{shrink: true}}
-                                            onChange={(e) => setExchange({
-                                                ...exchange,
-                                                coursesExchange: e.target.value
-                                            })}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={12}>
@@ -407,7 +425,13 @@ const ExchangeForm = ({id = -1}) => {
                                             fullWidth
                                             rows={4}
                                             defaultValue={exchange.comments}
-                                            onChange={(e) => setExchange({...exchange, comments: e.target.value})}
+                                            onChange={(e) => setExchange({
+                                                ...exchange,
+                                                details: {
+                                                    ...exchange.details,
+                                                    comments: [e.target.value]
+                                                }
+                                            })}
                                         />
                                     </Grid>
                                 </Grid>

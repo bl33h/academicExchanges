@@ -124,14 +124,6 @@ const columns = [
 export default function Table() {
     const [rows, setRows] = useState([]);
 
-    /**
-     * TODO: Fetch data from the backend
-     * ID Student
-     * ID U
-     * Detalles
-     *
-     */
-
     const fetchData = async () => {
         try {
             const response = await fetch('http://127.0.0.1:8001/exchanges/');
