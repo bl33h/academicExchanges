@@ -93,11 +93,13 @@ async def get_student_by_id(student_id: str = Path(...)):
             }
         }
     ]
-    student = await db["students"].find_one({"_id": ObjectId(student_id)})
+    student = await db["students"].aggregate(pipeline).to_list(1)
 
     if student:
         student["_id"] = str(student["_id"])
         student["career_id"] = str(student["career_id"])
+        student["career"]["_id"] = str(student["career"]["_id"])
+        student["career"]["faculty"]["_id"] = str(student["career"]["faculty"]["_id"])
         return student
     else:
         return {"error": "Estudiante no encontrado"}, 404
