@@ -157,12 +157,25 @@ const ExchangeForm = ({id = -1}) => {
     const updateExchange = async (exchange) => {
         try {
             console.log(exchange)
+            const new_exchange = {
+                student_id: exchange.student_id,
+                university_id: exchange.university_id,
+                details: {
+                    year: exchange.details.year,
+                    semester: exchange.details.semester,
+                    modality: exchange.details.modality,
+                    status: exchange.details.status,
+                    start_date: exchange.details.start_date,
+                    end_date: exchange.details.end_date,
+                    comments: [exchange.details.comments],
+                }
+            }
             const response = await fetch(`http://127.0.0.1:8001/exchanges/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(exchange)
+                body: JSON.stringify(new_exchange)
             });
         } catch (error) {
             setErrorOccurred(true);
@@ -206,7 +219,7 @@ const ExchangeForm = ({id = -1}) => {
                         icon: 'success',
                         confirmButtonText: 'Aceptar'
                     }).then(() => {
-                        // navigate("/exchanges");
+                        navigate("/exchanges");
                     });
                 }).catch((error) => {
                     setErrorOccurred(true);
@@ -214,13 +227,13 @@ const ExchangeForm = ({id = -1}) => {
                 });
             } else {
                 updateExchange(exchange_to_insert).then(() => {
-                    // Swal.fire({
-                    //     title: 'Intercambio actualizado',
-                    //     icon: 'success',
-                    //     confirmButtonText: 'Aceptar'
-                    // }).then(() => {
-                    //     navigate("/exchanges");
-                    // });
+                    Swal.fire({
+                        title: 'Intercambio actualizado',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        navigate("/exchanges");
+                    });
                 }).catch((error) => {
                     setErrorOccurred(true);
                     setError(error);
