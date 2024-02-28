@@ -56,11 +56,39 @@ async def get_students():
 
 @studentsRouter.get("/students/{student_id}")
 async def get_student_by_id(student_id: str = Path(...)):
-    student = await db["students"].find_one({"_id": ObjectId(student_id)})
+    pipeline = [
+        {
+            "$match": {"_id" : ObjectId(student_id)}    
+        },
+        {
+            "$lookup": {
+                "from": "careers",
+                "localField": "career_id",
+                "foreignField": "_id",
+                "as": "career_info"
+            }
+        },
+        {
+            "$unwind": "$career_info"
+        },
+        {
+            "$project":{
+                "_id": {"$toString": "$_id"},
+                "name": "$name",
+                "email": "$email",
+                "career_id": {"$toString": "$career_id"},
+                "career": "$career_info"
+            }
+        }
+    ]
+    student = await db["students"].aggregate(pipeline).to_list(1)
 
     if student:
+        student = student[0]
         student["_id"] = str(student["_id"])
         student["career_id"] = str(student["career_id"])
+        student["career"]["_id"] = str(student["career"]["_id"])
+        student["career"]["faculty"]["_id"] = str(student["career"]["faculty"]["_id"])
         return student
     else:
         return {"error": "Estudiante no encontrado"}, 404
@@ -69,9 +97,9 @@ async def get_student_by_id(student_id: str = Path(...)):
 async def create_student(student: Student):
     # Convierte las cadenas _id y career_id a ObjectId
     student_dict = student.dict(by_alias=True)
+    print(student_dict)
     carnet = student_dict["carnet"]
-    new_id = np.zeros(24, carnet)
-    student_dict["_id"] = ObjectId(new_id)
+    student_dict["_id"] = ObjectId(carnet)
     student_dict["career_id"] = ObjectId(student_dict["career_id"])
 
     new_student = await db["students"].insert_one(student_dict)
