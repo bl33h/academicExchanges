@@ -253,12 +253,12 @@ async def get_exchanges():
                 "student": "$student_info",
                 "university": "$uni_info"
             }
-        }
+        }#,
+        # { "$sort": { "_id":-1 } }
     ]
 
     exchanges = await db["exchanges"].aggregate(pipeline, allowDiskUse=True).to_list(1000)
-    exchanges_sorted = sorted(exchanges, key=lambda x: x['_id'], reverse=True)
-    for exchange in exchanges_sorted:
+    for exchange in exchanges:
         exchange["student"]["_id"] = str(exchange["student"]["_id"])
         exchange["student"]["career_id"] = str(exchange["student"]["career_id"])
         exchange["university"]["_id"] = str(exchange["university"]["_id"])
