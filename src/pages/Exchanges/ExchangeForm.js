@@ -140,6 +140,7 @@ const ExchangeForm = ({id = -1}) => {
 
     const insertExchange = async (exchange) => {
         try {
+            console.log(exchange)
             const response = await fetch('http://127.0.0.1:8001/exchanges', {
                 method: 'POST',
                 headers: {
@@ -195,7 +196,7 @@ const ExchangeForm = ({id = -1}) => {
                     status: exchange.details.status,
                     start_date: exchange.details.start_date,
                     end_date: exchange.details.end_date,
-                    comments: [exchange.details.comments],
+                    comments: exchange.details.comments,
                 }
             }
             if (isNewExchange) {
@@ -205,7 +206,7 @@ const ExchangeForm = ({id = -1}) => {
                         icon: 'success',
                         confirmButtonText: 'Aceptar'
                     }).then(() => {
-                        navigate("/exchanges");
+                        // navigate("/exchanges");
                     });
                 }).catch((error) => {
                     setErrorOccurred(true);
@@ -499,7 +500,7 @@ const ExchangeForm = ({id = -1}) => {
                                                 ...exchange,
                                                 details: {
                                                     ...exchange.details,
-                                                    comments: [e.target.value]
+                                                    comments: e.target.value
                                                 }
                                             })}
                                         />
