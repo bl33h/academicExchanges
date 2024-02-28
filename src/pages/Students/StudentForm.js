@@ -34,8 +34,6 @@ const StudentsForm = ({id = -1}) => {
         mail: "",
         facultyId: "",
         careerId: "",
-        campusId: "",
-        genderId: "",
     });
     const getStudentById = async (id) => {
         try {
@@ -47,23 +45,21 @@ const StudentsForm = ({id = -1}) => {
     }
     useEffect(() => {
         if (!isNewStudent) {
-
-            // getStudentById(id).then((student) => {
-            //     setStudent({
-            //         id: student.id,
-            //         name: student.name,
-            //         mail: student.mail,
-            //         facultyId: student.faculty_id,
-            //         careerId: student.career_id,
-            //         genderId: student.gender_id,
-            //         gender: student.gender,
-            //         campus: student.campus,
-            //         campusId: student.campus_id
-            //     })
-            // }).catch((error) => {
-            //     setErrorOccurred(true);
-            //     setError(error);
-            // })
+            getStudentById(id).then((student) => {
+                console.log(student)
+                // Remove the initial 0s from the id
+                student.id = student.carnet.replace(/^0+/, '');
+                setStudent({
+                    id: student.id,
+                    name: student.name,
+                    mail: student.email,
+                    facultyId: student.career.faculty._id,
+                    careerId: student.career_id,
+                })
+            }).catch((error) => {
+                setErrorOccurred(true);
+                setError(error);
+            })
         }
     }, []);
 
@@ -107,19 +103,6 @@ const StudentsForm = ({id = -1}) => {
         }
     }, [student.mail, firstTry]);
 
-    const [isCampusEmpty, setIsCampusEmpty] = useState(false);
-    useEffect(() => {
-        if (!firstTry) {
-            setIsCampusEmpty(student.campusId === "")
-        }
-    }, [student.campusId, firstTry]);
-
-    const [isGenderEmpty, setIsGenderEmpty] = useState(false);
-    useEffect(() => {
-        if (!firstTry) {
-            setIsGenderEmpty(student.genderId === "")
-        }
-    }, [student.genderId, firstTry]);
 
     const [faculties, setFaculties] = useState([]);
     const fetchFaculties = async () => {
@@ -211,17 +194,31 @@ const StudentsForm = ({id = -1}) => {
         }
     }
 
+    const updateStudent = async (student) => {
+        try {
+            const response = await fetch('http://127.0.0.1:8001/students/' + student.carnet, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(student)
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         setFirstTry(false);
         try {
+            // Pad the student id
+            const new_student = {
+                ...student,
+                carnet: student.id.padStart(24, '0'),
+                careerId: student.careerId.padStart(24, '0')
+            }
             if (isNewStudent) {
-                // Pad the student id
-                const new_student = {
-                    ...student,
-                    carnet: student.id.padStart(24, '0'),
-                    careerId: student.careerId.padStart(24, '0')
-                }
                 const doesExist = await doesStudentExist(new_student.id);
                 if (doesExist) { // Rise error
                     throw new Error(`El estudiante con carné "${id}" ya existe`);
@@ -251,30 +248,27 @@ const StudentsForm = ({id = -1}) => {
                     setError(error);
                 })
             } else {
-                console.log(student)
-                // updateStudent({
-                //     id: student.id,
-                //     name: student.name,
-                //     mail: student.mail,
-                //     career_id: student.careerId,
-                //     gender_id: student.genderId,
-                //     campus_id: student.campusId
-                // }).then(() => {
-                //     Swal.fire({
-                //         icon: 'success',
-                //         title: '¡Muy Bien!',
-                //         text: 'Estudiante actualizado exitosamente',
-                //         showConfirmButton: false,
-                //         timer: 1500
-                //     });
-                //     setTimeout(() => {
-                //         navigate('/estudiantes');
-                //     }, 1500);
-                // }).catch((error) => {
-                //     console.log(error)
-                //     setErrorOccurred(true);
-                //     setError(error);
-                // })
+                updateStudent({
+                    carnet: new_student.carnet,
+                    name: new_student.name,
+                    email: new_student.mail,
+                    career_id: new_student.careerId,
+                }).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Muy Bien!',
+                        text: 'Estudiante actualizado exitosamente',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    setTimeout(() => {
+                        navigate('/students');
+                    }, 1500);
+                }).catch((error) => {
+                    console.log(error)
+                    setErrorOccurred(true);
+                    setError(error);
+                })
             }
         } catch (error) {
             setErrorOccurred(true);
