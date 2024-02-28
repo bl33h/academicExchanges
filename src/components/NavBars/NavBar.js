@@ -17,7 +17,7 @@ import './NavBar.scss';
 import Logo from '../../assets/images/logo.png';
 import {useNavigate} from "react-router-dom";
 
-const pages = ['Estudiantes de Intercambio', 'Estudiantes', 'Universidades', 'Resumen',];
+const pages = ['Estudiantes de Intercambio', 'Estudiantes', 'Universidades', 'Estadísticas',];
 const settings = ['Perfil', 'Cerrar Sesión',];
 
 function NavBar() {
@@ -81,8 +81,8 @@ function NavBar() {
         navigate("/universities");
     }
 
-    const handleSummary = () => {
-        navigate("/summary");
+    const handleStatistics = () => {
+        navigate("/statistics");
     }
 
     const handleMenuClick = (page) => {
@@ -93,8 +93,8 @@ function NavBar() {
                 return handleStudents;
             case 'Universidades':
                 return handleUniversities;
-            case 'Resumen':
-                return handleSummary;
+            case 'Estadísticas':
+                return handleStatistics;
             default:
                 return handleCloseNavMenu;
         }

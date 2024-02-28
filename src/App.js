@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 
 import NotFound from "./pages/NotFound/NotFound";
+import Statistics from "./pages/Statistics/Statistics";
 import Exchanges from "./pages/Exchanges/Exchanges";
 import NewExchange from "./pages/Exchanges/NewExchange";
 import EditExchange from "./pages/Exchanges/EditExchange";
@@ -37,7 +38,7 @@ const App = () => {
                         <Route path={"/universities/new"} element={<NewUniversity/>}/>
                         <Route path={"/universities/edit/:id"} element={<EditUniversity/>}/>
                         {/*/!*STATISTICS*!/*/}
-                        {/*<Route path="/summary" element={<Summary/>}/>*/}
+                        <Route path="/statistics" element={<Statistics/>}/>
                         <Route path="*" element={<NotFound/>}/>
                     </Routes>
                 </>
