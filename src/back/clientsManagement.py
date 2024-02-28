@@ -329,6 +329,28 @@ async def create_exchange(exchange: Exchange):
     created_exchange = await db["exchanges"].find_one({"_id": new_exchange.inserted_id})
     return created_exchange
 
+@exchangesRouter.put("/exchanges/{exchange_id}")
+async def update_exchange(exchange_id: str, exchange: Exchange):
+    exchange_dict = exchange.dict(by_alias=True, exclude_unset=True)
+    exchange_dict["student_id"] = ObjectId(exchange_dict["student_id"])
+    exchange_dict["university_id"] = ObjectId(exchange_dict["university_id"])
+
+    updated_exchange = await db["exchanges"].find_one_and_update(
+        {"_id": ObjectId(exchange_id)},
+        {"$set": exchange_dict},
+        {"returnNewDocument": True}
+    )
+
+    if updated_exchange:
+        updated_exchange["_id"] = str(updated_exchange["_id"])
+        updated_exchange["student_id"] = str(updated_exchange["student_id"])
+        updated_exchange["university_id"] = str(updated_exchange["university_id"])
+        return updated_exchange
+    else:
+        return {"error": "Exchange not found"}, 404
+
+
+
 @exchangesRouter.delete("/exchanges/{exchange_id}")
 async def delete_exchange(exchange_id: str):
     delete_result = await db["exchanges"].delete_one({"_id": ObjectId(exchange_id)})
