@@ -153,10 +153,26 @@ const ExchangeForm = ({id = -1}) => {
         }
     }
 
+    const updateExchange = async (exchange) => {
+        try {
+            console.log(exchange)
+            const response = await fetch(`http://127.0.0.1:8001/exchanges/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(exchange)
+            });
+        } catch (error) {
+            setErrorOccurred(true);
+            setError(error);
+
+        }
+    }
+
     const handleSubmit = async (event) => {
         setFirstTry(false);
         event.preventDefault();
-        console.log(exchange)
 
         try {
             if (!isDataValid()) {
@@ -167,20 +183,22 @@ const ExchangeForm = ({id = -1}) => {
                 setIsStudentEmpty(true);
                 throw new Error("El estudiante no existe");
             }
-            if (isNewExchange) {
-                const exchange_to_insert = {
-                    student_id: exchange.student_id,
-                    university_id: exchange.university_id,
-                    details: {
-                        year: exchange.details.year,
-                        semester: exchange.details.semester,
-                        modality: exchange.details.modality,
-                        status: exchange.details.status,
-                        start_date: exchange.details.start_date,
-                        end_date: exchange.details.end_date,
-                        comments: exchange.details.comments,
-                    }
+            const paddedStudentId = exchange.student_id.padStart(24, '0');
+            const paddedUniversityId = exchange.university_id.padStart(24, '0');
+            let exchange_to_insert = {
+                student_id: paddedStudentId,
+                university_id: paddedUniversityId,
+                details: {
+                    year: exchange.details.year,
+                    semester: exchange.details.semester,
+                    modality: exchange.details.modality,
+                    status: exchange.details.status,
+                    start_date: exchange.details.start_date,
+                    end_date: exchange.details.end_date,
+                    comments: [exchange.details.comments],
                 }
+            }
+            if (isNewExchange) {
                 insertExchange(exchange_to_insert).then(() => {
                     Swal.fire({
                         title: 'Intercambio registrado',
@@ -194,14 +212,60 @@ const ExchangeForm = ({id = -1}) => {
                     setError(error);
                 });
             } else {
-                exchange.id = id;
-                console.log("Editing exchange with id:", id)
+                updateExchange(exchange_to_insert).then(() => {
+                    // Swal.fire({
+                    //     title: 'Intercambio actualizado',
+                    //     icon: 'success',
+                    //     confirmButtonText: 'Aceptar'
+                    // }).then(() => {
+                    //     navigate("/exchanges");
+                    // });
+                }).catch((error) => {
+                    setErrorOccurred(true);
+                    setError(error);
+                });
             }
         } catch (error) {
             setErrorOccurred(true);
             setError(error)
         }
     }
+
+    useEffect(() => {
+        if (!isNewExchange && modalities.length > 0 && states.length > 0) {
+            try {
+                fetch(`http://127.0.0.1:8001/exchanges/${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const exchange_to_edit = {
+                            id: id,
+                            student_id: data.student_id.replace(/^0+/, ''),
+                            university_name: data.university.name,
+                            university_id: data.university_id,
+                            details: {
+                                year: data.details.year,
+                                semester: data.details.semester,
+                                modality: data.details.modality,
+                                modality_id: modalities.find((modality) => modality.modality === data.details.modality).id,
+                                status: data.details.status,
+                                status_id: states.find((state) => state.state === data.details.status).id,
+                                start_date: data.details.start_date,
+                                end_date: data.details.end_date,
+                                comments: data.details.comments[0],
+                            }
+                        }
+                        setExchange(exchange_to_edit);
+                    })
+                    .catch((error) => {
+                        setErrorOccurred(true);
+                        setError(error);
+                    });
+            } catch (error) {
+                setErrorOccurred(true);
+                setError(error);
+            }
+        }
+    }, [modalities, states]);
 
     return (
         <>
@@ -390,12 +454,15 @@ const ExchangeForm = ({id = -1}) => {
                                             fullWidth
                                             id="start_date"
                                             label="Fecha Inicio"
-                                            value={exchange.start_date}
+                                            value={exchange.details.start_date}
                                             InputLabelProps={{shrink: true}}
                                             onChange={(e) => {
                                                 setExchange({
                                                     ...exchange,
-                                                    details: {...exchange.details, start_date: e.target.value}
+                                                    details: {
+                                                        ...exchange.details,
+                                                        start_date: e.target.value
+                                                    }
                                                 });
                                             }}
                                         />
@@ -406,12 +473,15 @@ const ExchangeForm = ({id = -1}) => {
                                             fullWidth
                                             id="end_date"
                                             label="Fecha Fin"
-                                            value={exchange.end_date}
+                                            value={exchange.details.end_date}
                                             InputLabelProps={{shrink: true}}
                                             onChange={(e) => {
                                                 setExchange({
                                                     ...exchange,
-                                                    details: {...exchange.details, end_date: e.target.value}
+                                                    details: {
+                                                        ...exchange.details,
+                                                        end_date: e.target.value
+                                                    }
                                                 });
                                             }}
                                         />
@@ -424,7 +494,7 @@ const ExchangeForm = ({id = -1}) => {
                                             multiline
                                             fullWidth
                                             rows={4}
-                                            defaultValue={exchange.comments}
+                                            defaultValue={exchange.details.comments}
                                             onChange={(e) => setExchange({
                                                 ...exchange,
                                                 details: {
