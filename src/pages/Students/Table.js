@@ -5,8 +5,25 @@ import LinearProgress from "@mui/material/LinearProgress";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const handleDelete = (id) => {
-    alert(`Deleting student with id ${id}`);
+const handleDelete = async (id) => {
+    const paddedId = String(id).padStart(24, '0');
+    try {
+        const response = await fetch('http://127.0.0.1:8001/students/' + paddedId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then((response) => {
+            if (response.ok) {
+                alert('Estudiante eliminado correctamente')
+                window.location.href = '/students';
+            } else {
+                console.error('Error:', response);
+            }
+        });
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 const columns = [
