@@ -343,11 +343,16 @@ async def update_exchange(exchange_id: str, exchange: Exchange):
 
     if updated_exchange:
         updated_exchange["_id"] = str(updated_exchange["_id"])
-        updated_exchange["student_id"] = str(updated_exchange["student_id"])
-        updated_exchange["university_id"] = str(updated_exchange["university_id"])
+
+        if "student_id" in updated_exchange:
+            updated_exchange["student_id"] = str(updated_exchange["student_id"])
+
+        if "university_id" in updated_exchange:
+            updated_exchange["university_id"] = str(updated_exchange["university_id"])
         return updated_exchange
     else:
         return {"error": "Exchange not found"}, 404
+
 
 
 
