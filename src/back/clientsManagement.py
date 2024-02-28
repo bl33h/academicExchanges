@@ -72,30 +72,19 @@ async def get_student_by_id(student_id: str = Path(...)):
             "$unwind": "$career_info"
         },
         {
-            "$lookup": {
-                "from": "faculties",
-                "localField": "career_info.faculty._id",
-                "foreignField": "_id",
-                "as": "faculty_info"
-            }
-        },
-        {
-            "$unwind": "$faculty_info"
-        },
-        {
             "$project":{
                 "_id": {"$toString": "$_id"},
                 "name": "$name",
                 "email": "$email",
                 "career_id": {"$toString": "$career_id"},
-                "career": "$career_info",
-                "faculty": "$faculty_info"
+                "career": "$career_info"
             }
         }
     ]
     student = await db["students"].aggregate(pipeline).to_list(1)
 
     if student:
+        student = student[0]
         student["_id"] = str(student["_id"])
         student["career_id"] = str(student["career_id"])
         student["career"]["_id"] = str(student["career"]["_id"])
