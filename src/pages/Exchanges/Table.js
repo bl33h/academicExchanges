@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useEffect, useState} from 'react';
 import {DataGrid, GridActionsCellItem, GridToolbar} from '@mui/x-data-grid';
 import LinearProgress from '@mui/material/LinearProgress';
-// import {getStudentsInExchanges, deleteExchange} from "../../../supabase/ExchangeQueries";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Swal from 'sweetalert2'
@@ -51,6 +51,14 @@ const columns = [
         type: 'actions',
         width: 20,
         getActions: (params) => [
+            <GridActionsCellItem
+                icon={<OpenInNewIcon/>}
+                label="Expandir"
+                onClick={() => {
+                    window.location.href = `/exchanges/details/${params.id}`;
+                }}
+                showInMenu
+            />,
             <GridActionsCellItem
                 icon={<EditIcon/>}
                 label="Editar"

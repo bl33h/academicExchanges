@@ -5,6 +5,7 @@ import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import NotFound from "./pages/NotFound/NotFound";
 import Statistics from "./pages/Statistics/Statistics";
 import Exchanges from "./pages/Exchanges/Exchanges";
+import ExchangeDetails from "./pages/Exchanges/ExchangeDetails";
 import NewExchange from "./pages/Exchanges/NewExchange";
 import EditExchange from "./pages/Exchanges/EditExchange";
 import Students from "./pages/Students/Students";
@@ -29,6 +30,7 @@ const App = () => {
                         <Route path="/exchanges" element={<Exchanges/>}/>
                         <Route path="/exchanges/new" element={<NewExchange/>}/>
                         <Route path="/exchanges/edit/:id" element={<EditExchange/>}/>
+                        <Route path="/exchanges/details/:id" element={<ExchangeDetails/>}/>
                         {/*STUDENTS*/}
                         <Route path="/students" element={<Students/>}/>
                         <Route path="/students/new" element={<NewStudent/>}/>
