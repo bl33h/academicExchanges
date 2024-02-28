@@ -76,6 +76,7 @@ async def get_student_by_id(student_id: str = Path(...)):
                 "_id": {"$toString": "$_id"},
                 "name": "$name",
                 "email": "$email",
+                "carnet" : "$carnet",
                 "career_id": {"$toString": "$career_id"},
                 "career": "$career_info"
             }
